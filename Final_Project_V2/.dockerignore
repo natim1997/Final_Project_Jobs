@@ -1,0 +1,19 @@
+# Ignore Virtual Environment
+venv/
+env/
+
+# Ignore Python Cache
+__pycache__/
+*.pyc
+
+# Ignore Massive Training Datasets
+*.csv
+Data/
+
+# Ignore Training Scripts 
+train_*.py
+dataset_balancer.py
+cv_generator.py
+job_scraper.py
+mlp_data_generator.py
+svm_feature_extractor.py

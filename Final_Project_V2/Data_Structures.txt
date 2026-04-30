@@ -1,0 +1,95 @@
+{
+  "==================================================": "",
+  "1. CANDIDATE PROFILE (טופס מועמד/מחפש עבודה)": "",
+  "==================================================": "",
+  "candidate": {
+    "personal_info": {
+      "first_name": "ישראל",
+      "last_name": "ישראלי",
+      "age": 24,
+      "location_city": "תל אביב",
+      "mobility": {
+        "has_car": false,
+        "scooter_or_bike": true,
+        "willing_to_travel_radius_km": 15
+      }
+    },
+    
+    "current_status": {
+      "employment_status": "student", 
+      "education_level": "תואר ראשון",
+      "field_of_study": "מדעי המחשב"
+    },
+
+    "experience_and_skills": {
+      "total_experience_years": 2,
+      "hard_skills": ["python", "java", "sql", "excel", "react"],
+      "soft_skills": ["עבודת צוות", "למידה עצמית", "אחריות", "עמידה בלחצים"],
+      "languages": ["hebrew", "english"],
+      "licenses_and_certs": ["driving_b", "security_07"]
+    },
+
+    "availability_and_schedule": {
+      "preferred_job_type": ["shifts", "part_time"], 
+      "work_model_preference": "היברידי", 
+      "immediate_start": true,
+      "busy_slots": [
+        {"day": "Sunday", "start": "08:00", "end": "14:00"},
+        {"day": "Tuesday", "start": "10:00", "end": "18:00"}
+      ]
+    },
+
+    "preferences": {
+      "expected_hourly_wage_min": 45,
+      "suitable_for_students": true,
+      "prefer_work_alone": false,
+      "prefer_low_physical_effort": true
+    },
+
+    "text_fields": {
+      "about_me": "חייל משוחרר מהנדסה קרבית, כרגע סטודנט שנה ב' למדעי המחשב. מחפש עבודה דינמית שאפשר לשלב עם הלימודים, רצוי בסביבה צעירה.",
+      "additional_free_text": "אני ממש גמיש במשמרות סופשבוע ומוכן לעבוד גם בלילות אם מדובר בעבודה שאפשר ללמוד בה תוך כדי משמרת."
+    }
+  },
+
+  "==================================================": "",
+  "2. JOB POSTING (טופס משרה/הצעת עבודה)": "",
+  "==================================================": "",
+  "job": {
+    "basic_info": {
+      "job_title": "מפתח Python ג'וניור / תומך אפליקטיבי",
+      "company_name": "TechStart Ltd",
+      "location_city": "רמת גן",
+      "job_type": "part_time",
+      "work_model": "היברידי",
+      "offered_hourly_wage": 55
+    },
+
+    "requirements": {
+      "min_experience_years": 1,
+      "required_education": "סטודנט או תואר ראשון",
+      "required_hard_skills": ["python", "sql", "aws", "linux"],
+      "required_soft_skills": ["תודעת שירות", "עבודת צוות", "יכולת למידה מהירה"],
+      "required_languages": ["hebrew", "english"],
+      "mandatory_licenses": []
+    },
+
+    "job_characteristics": {
+      "suitable_for_students": true,
+      "is_team_work": true,
+      "high_physical_effort": false,
+      "requires_travel": false
+    },
+
+    "schedule": {
+      "is_flexible": true,
+      "shifts_required": ["ערב", "לילה", "סופש"],
+      "specific_required_slots": []
+    },
+
+    "text_fields": {
+      "job_description": "אנו מחפשים סטודנט/ית טכנולוגי/ת להשתלבות בצוות הפיתוח והתמיכה שלנו. העבודה כוללת ניטור מערכות, כתיבת סקריפטים בפייתון ופתרון תקלות בזמן אמת.",
+      "additional_free_text": "המשרה סופר גמישה ומתאימה מאוד לסטודנטים שיכולים לתת 2-3 משמרות בשבוע. יש חניה חינם בבניין ואחלה תנאים!"
+    }
+  }
+}

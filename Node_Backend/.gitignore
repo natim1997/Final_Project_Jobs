@@ -1,0 +1,20 @@
+# Ignore node modules
+node_modules/
+
+# Ignore environment variables (Secrets)
+.env
+
+# Ignore Firebase Service Account Key (CRITICAL SECURITY)
+serviceAccountKey.json
+src/config/serviceAccountKey.json
+
+# Ignore virtual environments
+venv/
+.venv/
+env/
+
+# Ignore heavy model files
+*.safetensors
+*.bin
+*.pt
+*.dll

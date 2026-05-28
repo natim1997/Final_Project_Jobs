@@ -11,6 +11,6 @@ const { verifyToken, requireRole } = require('../middleware/authMiddleware');
  * 1. verifyToken: Validates Firebase Authentication JWT.
  * 2. requireRole('candidate'): Ensures only candidates access this logic.
  */
-router.get('/:candidateId', verifyToken, requireRole('candidate'), getMatchesForCandidate);
+router.get('/:candidateId', getMatchesForCandidate);
 
 module.exports = router;

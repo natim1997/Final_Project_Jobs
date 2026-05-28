@@ -8,16 +8,23 @@ const Joi = require('joi');
 const jobSchema = Joi.object({
     basic_info: Joi.object({
         job_title: Joi.string().min(3).max(100).required(),
-        description: Joi.string().max(1000).optional()
+        company_name: Joi.string().allow(null, '').optional(), // Made optional for fast deployment
+        category: Joi.string().allow(null, '').optional()       // Made optional for fast deployment
     }).required(),
     
     location: Joi.object({
+        address: Joi.string().required(),
         lat: Joi.number().min(-90).max(90).required(),
         lng: Joi.number().min(-180).max(180).required()
     }).required(),
     
+    apparel_requirements: Joi.array().items(Joi.string()).optional(), // Added array validation for dress codes
+    dealbreakers: Joi.object().optional(),
     characteristics: Joi.object().optional(),
-    schedule: Joi.object().optional()
+    schedule: Joi.object().optional(),
+    availability: Joi.object().optional(),
+    salary_info: Joi.object().optional(),
+    description: Joi.string().max(1000).allow('').optional()
     
     // Security Note: allowUnknown(true) permits fields not explicitly listed above.
     // In a strict production environment, you should map EVERY field and set this to false

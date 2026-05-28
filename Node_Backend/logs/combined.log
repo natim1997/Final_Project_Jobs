@@ -28,3 +28,113 @@
 {"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-04-29 18:44:17"}
 {"level":"info","message":"::1 - - [29/Apr/2026:15:44:26 +0000] \"GET /api/matches/cand123 HTTP/1.1\" 200 839 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-29 18:44:26"}
 {"level":"info","message":"::1 - - [29/Apr/2026:15:49:56 +0000] \"GET /api/matches/cand123 HTTP/1.1\" 200 65058 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-29 18:49:56"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 14:45:05"}
+{"level":"info","message":"::1 - - [16/May/2026:11:49:07 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 14:49:07"}
+{"level":"info","message":"::1 - - [16/May/2026:11:50:17 +0000] \"POST /api/jobs HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 14:50:17"}
+{"level":"info","message":"::1 - - [16/May/2026:11:59:05 +0000] \"POST /api/jobs HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 14:59:05"}
+{"level":"info","message":"::1 - - [16/May/2026:11:59:08 +0000] \"POST /api/jobs HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 14:59:08"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 15:06:16"}
+{"level":"info","message":"::1 - - [16/May/2026:12:06:45 +0000] \"POST /api/jobs HTTP/1.1\" 400 69 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:06:45"}
+{"level":"info","message":"::1 - - [16/May/2026:12:07:13 +0000] \"POST /api/jobs HTTP/1.1\" 400 85 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:07:13"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 15:10:48"}
+{"level":"info","message":"::1 - - [16/May/2026:12:36:26 +0000] \"POST /api/jobs HTTP/1.1\" 403 66 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:36:26"}
+{"level":"info","message":"::1 - - [16/May/2026:12:39:01 +0000] \"POST /api/jobs HTTP/1.1\" 403 66 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:39:01"}
+{"level":"info","message":"::1 - - [16/May/2026:12:39:12 +0000] \"POST /api/jobs HTTP/1.1\" 403 66 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:39:12"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 15:39:27"}
+{"level":"info","message":"::1 - - [16/May/2026:12:39:37 +0000] \"POST /api/jobs HTTP/1.1\" 400 69 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:39:37"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 15:44:12"}
+{"level":"info","message":"::1 - - [16/May/2026:12:44:19 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:44:19"}
+{"level":"info","message":"::1 - - [16/May/2026:12:45:58 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 67 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:45:58"}
+{"level":"info","message":"::1 - - [16/May/2026:12:48:23 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 67 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:48:23"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 15:48:31"}
+{"level":"info","message":"::1 - - [16/May/2026:12:48:38 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 26 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:48:38"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-16 15:51:17"}
+{"level":"info","message":"::1 - - [16/May/2026:12:51:26 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1174 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:51:26"}
+{"level":"info","message":"::1 - - [16/May/2026:12:56:26 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1174 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-16 15:56:26"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-17 11:46:39"}
+{"level":"info","message":"::1 - - [17/May/2026:08:47:20 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 11:47:20"}
+{"level":"info","message":"::1 - - [17/May/2026:08:59:11 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1174 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 11:59:11"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-17 12:04:49"}
+{"level":"info","message":"::1 - - [17/May/2026:09:05:33 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1174 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:05:33"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-17 12:13:05"}
+{"level":"info","message":"::1 - - [17/May/2026:09:13:19 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:13:19"}
+{"level":"info","message":"::1 - - [17/May/2026:09:20:45 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:20:45"}
+{"level":"info","message":"::1 - - [17/May/2026:09:27:35 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:27:35"}
+{"level":"info","message":"::1 - - [17/May/2026:09:30:32 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:30:32"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-17 12:33:32"}
+{"level":"info","message":"::1 - - [17/May/2026:09:33:41 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:33:41"}
+{"level":"info","message":"::1 - - [17/May/2026:09:36:31 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:36:31"}
+{"level":"info","message":"::1 - - [17/May/2026:09:36:37 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:36:37"}
+{"level":"info","message":"::1 - - [17/May/2026:09:39:35 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:39:35"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-17 12:40:04"}
+{"level":"info","message":"::1 - - [17/May/2026:09:40:19 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-17 12:40:20"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-19 09:31:15"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-19 10:01:53"}
+{"level":"info","message":"::1 - - [19/May/2026:07:03:00 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:03:00"}
+{"level":"info","message":"::1 - - [19/May/2026:07:09:26 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:09:26"}
+{"level":"info","message":"::1 - - [19/May/2026:07:21:47 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 401 58 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:21:47"}
+{"level":"info","message":"::1 - - [19/May/2026:07:21:57 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:21:57"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-19 10:24:55"}
+{"level":"error","message":"Matchmaking Error: Cannot read properties of undefined (reading 'lat')","stack":"TypeError: Cannot read properties of undefined (reading 'lat')\n    at getMatchesForCandidate (C:\\Users\\netan\\JobMatcher_Project\\Node_Backend\\src\\controllers\\matchController.js:98:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2026-05-19 10:25:21"}
+{"level":"info","message":"::1 - - [19/May/2026:07:25:21 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 500 33 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:25:21"}
+{"level":"info","message":"::1 - - [19/May/2026:07:25:55 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1152 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:25:55"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-19 10:35:58"}
+{"level":"info","message":"::1 - - [19/May/2026:07:36:08 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:36:08"}
+{"level":"info","message":"::1 - - [19/May/2026:07:41:19 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:41:19"}
+{"level":"info","message":"::1 - - [19/May/2026:07:41:35 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:41:35"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-19 10:48:21"}
+{"level":"info","message":"::1 - - [19/May/2026:07:48:27 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:48:27"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-19 10:53:36"}
+{"level":"info","message":"::1 - - [19/May/2026:07:53:51 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:53:51"}
+{"level":"info","message":"::1 - - [19/May/2026:07:56:30 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 10:56:30"}
+{"level":"info","message":"::1 - - [19/May/2026:08:01:48 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 11:01:48"}
+{"level":"info","message":"::1 - - [19/May/2026:08:06:03 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 11:06:03"}
+{"level":"info","message":"::1 - - [19/May/2026:08:08:50 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1175 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-19 11:08:50"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 11:30:41"}
+{"level":"info","message":"::1 - - [20/May/2026:08:31:42 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 11:31:42"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 11:37:55"}
+{"level":"info","message":"::1 - - [20/May/2026:08:39:07 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 11:39:07"}
+{"level":"info","message":"::1 - - [20/May/2026:08:39:32 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 11:39:32"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 11:45:30"}
+{"level":"info","message":"::1 - - [20/May/2026:08:47:40 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 11:47:40"}
+{"level":"info","message":"::1 - - [20/May/2026:08:56:29 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 1169 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 11:56:29"}
+{"level":"info","message":"::1 - - [20/May/2026:09:07:36 +0000] \"POST /api/jobs/job_tech_001.json HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:07:36"}
+{"level":"info","message":"::1 - - [20/May/2026:09:11:59 +0000] \"POST /api/jobs/job_tech_001.json HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:11:59"}
+{"level":"info","message":"::1 - - [20/May/2026:09:12:01 +0000] \"POST /api/jobs/job_tech_001.json HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:12:01"}
+{"level":"info","message":"::1 - - [20/May/2026:09:12:21 +0000] \"POST /api/jobs/job_tech_001.json HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:12:21"}
+{"level":"info","message":"::1 - - [20/May/2026:09:13:03 +0000] \"POST /api/jobs/job_tech_001.json HTTP/1.1\" 403 48 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:13:03"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 12:40:00"}
+{"level":"info","message":"::1 - - [20/May/2026:09:40:05 +0000] \"POST /api/jobs/job_tech_001.json HTTP/1.1\" 404 166 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:40:05"}
+{"level":"info","message":"::1 - - [20/May/2026:09:41:33 +0000] \"POST /api/jobs HTTP/1.1\" 400 83 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:41:33"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 12:44:46"}
+{"level":"info","message":"::1 - - [20/May/2026:09:44:50 +0000] \"POST /api/jobs HTTP/1.1\" 400 69 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:44:50"}
+{"level":"info","message":"::1 - - [20/May/2026:09:47:22 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:47:22"}
+{"level":"info","message":"::1 - - [20/May/2026:09:53:48 +0000] \"POST /api/candidates/cand_netanel_1997 HTTP/1.1\" 404 172 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:53:48"}
+{"level":"info","message":"::1 - - [20/May/2026:09:54:19 +0000] \"POST /api/candidates/cand_netanel_1997.json HTTP/1.1\" 404 177 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 12:54:19"}
+{"level":"info","message":"::1 - - [20/May/2026:10:02:24 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2053 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:02:24"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 13:12:10"}
+{"level":"info","message":"::1 - - [20/May/2026:10:13:29 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2054 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:13:29"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 13:24:51"}
+{"level":"error","message":"Matchmaking Error: Cannot read properties of undefined (reading 'lat')","stack":"TypeError: Cannot read properties of undefined (reading 'lat')\n    at getMatchesForCandidate (C:\\Users\\netan\\JobMatcher_Project\\Node_Backend\\src\\controllers\\matchController.js:98:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2026-05-20 13:24:57"}
+{"level":"info","message":"::1 - - [20/May/2026:10:24:57 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 500 33 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:24:57"}
+{"level":"error","message":"Matchmaking Error: Cannot read properties of undefined (reading 'lat')","stack":"TypeError: Cannot read properties of undefined (reading 'lat')\n    at getMatchesForCandidate (C:\\Users\\netan\\JobMatcher_Project\\Node_Backend\\src\\controllers\\matchController.js:98:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2026-05-20 13:25:06"}
+{"level":"info","message":"::1 - - [20/May/2026:10:25:06 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 500 33 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:25:06"}
+{"level":"info","message":"::1 - - [20/May/2026:10:27:58 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2052 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:27:58"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 13:37:26"}
+{"level":"info","message":"::1 - - [20/May/2026:10:37:55 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2052 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:37:55"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-20 13:40:02"}
+{"level":"info","message":"::1 - - [20/May/2026:10:40:11 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2052 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:40:11"}
+{"level":"info","message":"::1 - - [20/May/2026:10:46:38 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2052 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-20 13:46:38"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-21 09:58:30"}
+{"level":"info","message":"::1 - - [21/May/2026:07:00:15 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2049 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-21 10:00:15"}
+{"level":"info","message":"::1 - - [21/May/2026:07:29:21 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2049 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-21 10:29:21"}
+{"level":"info","message":"::1 - - [21/May/2026:07:31:33 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2851 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-21 10:31:33"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-21 15:18:25"}
+{"level":"info","message":"::1 - - [21/May/2026:12:26:02 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2798 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-21 15:26:02"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-26 09:26:24"}
+{"level":"info","message":"::1 - - [26/May/2026:06:29:56 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 47 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 09:29:56"}
+{"level":"info","message":"::1 - - [26/May/2026:06:31:17 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2874 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 09:31:17"}
+{"level":"info","message":"::1 - - [26/May/2026:06:34:42 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2010 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 09:34:42"}
+{"level":"info","message":"::1 - - [26/May/2026:07:00:28 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2014 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 10:00:28"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-26 10:03:46"}
+{"level":"info","message":"::1 - - [26/May/2026:07:04:00 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2014 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 10:04:00"}

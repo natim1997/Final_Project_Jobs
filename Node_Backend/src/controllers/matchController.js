@@ -15,8 +15,7 @@ const logger = require('../config/logger');
 const anonymizeCandidateData = (candidateData, candidateId) => {
     const scrubbedData = JSON.parse(JSON.stringify(candidateData));
     if (scrubbedData.personal_info) {
-        delete scrubbedData.personal_info.first_name;
-        delete scrubbedData.personal_info.last_name;
+        delete scrubbedData.personal_info.full_name;
         delete scrubbedData.personal_info.email;
         delete scrubbedData.personal_info.phone;
     }
@@ -25,8 +24,43 @@ const anonymizeCandidateData = (candidateData, candidateId) => {
 };
 
 // ==========================================
-// Matchmaking Helper Functions
+// Matchmaking Helper Functions & Normalization
 // ==========================================
+
+/**
+ * Normalizes raw job data from Firebase into a strict structured object.
+ * This prevents inline bugs and ensures all down-stream logic can trust the schema.
+ */
+const normalizeJobData = (rawJob, jobId) => {
+    // Handle cases where description might be nested in text_fields accidentally
+    const description = rawJob.description || rawJob.text_fields?.description || "";
+    
+    // Clean string quotes if they were added manually in Firebase UI
+    const cleanDescription = description.replace(/^"|"$/g, '');
+
+    return {
+        jobId: jobId,
+        description: cleanDescription,
+        apparel_requirements: rawJob.apparel_requirements || [],
+        availability: rawJob.availability || null,
+        characteristics: rawJob.characteristics || {},
+        dealbreakers: rawJob.dealbreakers || {},
+        location: {
+            lat: rawJob.location?.lat || rawJob.basic_info?.lat || null,
+            lng: rawJob.location?.lng || rawJob.basic_info?.lng || null
+        },
+        requirements: {
+            tech_stack: rawJob.requirements?.tech_stack || [],
+            languages: rawJob.requirements?.languages || [],
+            min_experience_years: rawJob.requirements?.min_experience_years || 0
+        },
+        basic_info: {
+            job_title: rawJob.basic_info?.job_title || "Position",
+            company_name: rawJob.basic_info?.company_name || "Unknown Company",
+            address: rawJob.basic_info?.address || rawJob.basic_info?.location_city || ""
+        }
+    };
+};
 
 /**
  * Calculates distance in KM between two points.
@@ -61,43 +95,38 @@ const failsDealbreakers = (candidatePrefs, jobCharacteristics) => {
 // Main Controller
 // ==========================================
 
-/**
- * Main function to generate and return job matches for a user.
- */
 const getMatchesForCandidate = async (req, res) => {
     try {
         const candidateId = req.params.candidateId;
 
-        // 1. Security Check (Ensure user only requests their own matches)
-        if (req.user && req.user.uid !== candidateId) {
-            return res.status(403).json({ error: "Access Denied." });
-        }
-
-        // 2. Fetch Candidate Profile
+        // Fetch Candidate Profile
         const candidateSnap = await db.ref(`candidates/${candidateId}`).once('value');
         if (!candidateSnap.exists()) {
             return res.status(404).json({ error: "Candidate not found." });
         }
         
         const candidateData = candidateSnap.val();
-        const candidateLoc = candidateData.location || {};
-        const maxDist = candidateLoc.max_distance_km || 25;
+        const personalInfo = candidateData.personal_info || {};
+        const maxDist = personalInfo.max_distance || 25; 
         
         const secureCandidatePayload = anonymizeCandidateData(candidateData, candidateId);
 
-        // 3. Fetch All Available Jobs
+        // Fetch All Available Jobs
         const jobsSnap = await db.ref('jobs').once('value');
         const allJobs = jobsSnap.val() || {};
         let matchResults = [];
 
-        // 4. Processing Loop
-        for (const jobId in allJobs) {
-            const jobData = allJobs[jobId];
-            const jobLoc = jobData.location || {};
+        // Processing Loop
+        for (const rawJobId in allJobs) {
+            // Normalize the job structure immediately at the entry point
+            const jobData = normalizeJobData(allJobs[rawJobId], rawJobId);
+            const jobLoc = jobData.location;
+
+            console.log(`Checking job: ${jobData.basic_info.job_title} | ID: ${jobData.jobId}`);
 
             // --- FILTER A: Geo-Distance ---
-            if (candidateLoc.lat && jobLoc.lat) {
-                const distance = calculateDistance(candidateLoc.lat, candidateLoc.lng, jobLoc.lat, jobLoc.lng);
+            if (req.body?.lat && jobLoc.lat) { 
+                const distance = calculateDistance(req.body.lat, req.body.lng, jobLoc.lat, jobLoc.lng);
                 if (distance > maxDist) continue; 
                 jobData.calculated_distance = Number(distance.toFixed(1));
             }
@@ -105,45 +134,86 @@ const getMatchesForCandidate = async (req, res) => {
             // --- FILTER B: Strict Schedule ---
             if (jobData.availability && candidateData.availability) {
                 const scheduleScore = calculateScheduleMatch(jobData.availability, candidateData.availability);
-                if (scheduleScore < 100) continue; 
+                if (scheduleScore < 100) {
+                    console.log(`DEBUG: Job ${jobData.jobId} failed Schedule Match (Score: ${scheduleScore})`);
+                    continue; 
+                }
             }
 
             // --- FILTER C: Dealbreakers ---
             if (failsDealbreakers(candidateData.preferences, jobData.characteristics)) {
+                console.log(`DEBUG: Job ${jobData.jobId} failed Dealbreakers`);
                 continue;
             }
 
             try {
                 // --- STEP D: AI Semantic Scoring ---
-                const aiResponse = await getAiSemanticScore(jobData, secureCandidatePayload);
                 
-                const rawAiScore = (typeof aiResponse === 'object') ? aiResponse.score : aiResponse;
-                const aiExplanation = aiResponse.reason || "Match based on your overall profile and skills.";
+                // Construct clean payload using normalized fields
+                const aiJobPayload = {
+                    description: jobData.description,
+                    apparel_requirements: jobData.apparel_requirements,
+                    requirements: jobData.requirements,
+                    basic_info: {
+                        location_city: jobData.basic_info.address.split(',').pop().trim(),
+                        job_title: jobData.basic_info.job_title
+                    },
+                    dealbreakers: jobData.dealbreakers
+                };
 
-                // --- STEP E: Final Weighted Score ---
-                const finalResult = calculateFinalMatchScore(jobData, candidateData, rawAiScore);
+                // Send clean data to Python AI server
+                const aiResponse = await getAiSemanticScore(aiJobPayload, secureCandidatePayload);
+                
+                let rawAiScore = 0;
+                let aiExplanation = "Match based on your overall profile and skills.";
+                let isHardRejected = false;
 
-                if (finalResult.finalScore > 0) {
+                if (aiResponse && typeof aiResponse === 'object') {
+                    rawAiScore = aiResponse.Final_Score ?? aiResponse.score ?? 0;
+                    aiExplanation = aiResponse.Reason || aiResponse.reason || aiExplanation;
+                    if (aiResponse.Status === "REJECTED") {
+                        isHardRejected = true;
+                    }
+                }
+
+                // --- STEP E: Final Decision Processing ---
+                if (isHardRejected) {
                     matchResults.push({
-                        jobId: jobId,
-                        job_title: jobData.basic_info?.job_title || "Position",
-                        final_match_score: finalResult.finalScore,
+                        jobId: jobData.jobId,
+                        job_title: jobData.basic_info.job_title,
+                        company_name: jobData.basic_info.company_name,
+                        final_match_score: 0,
                         match_explanation: aiExplanation, 
                         distance_km: jobData.calculated_distance || 0,
-                        status: finalResult.status,
-                        breakdown: finalResult.breakdown,
+                        status: "REJECTED",
+                        breakdown: aiResponse.Breakdown || {},
                         full_job_data: jobData 
                     });
+                } else {
+                    const finalResult = calculateFinalMatchScore(jobData, candidateData, rawAiScore);
+
+                    if (finalResult.finalScore > 0) {
+                        matchResults.push({
+                            jobId: jobData.jobId,
+                            job_title: jobData.basic_info.job_title,
+                            company_name: jobData.basic_info.company_name,
+                            final_match_score: finalResult.finalScore,
+                            match_explanation: aiExplanation, 
+                            distance_km: jobData.calculated_distance || 0,
+                            status: finalResult.status,
+                            breakdown: finalResult.breakdown,
+                            full_job_data: jobData 
+                        });
+                    }
                 }
             } catch (aiError) {
-                logger.error(`AI logic error for job ${jobId}: ${aiError.message}`);
+                logger.error(`AI logic error for job ${jobData.jobId}: ${aiError.message}`);
             }
         }
 
-        // 5. Sort matches (Highest score first)
+        // Sort matches (Highest score first)
         matchResults.sort((a, b) => b.final_match_score - a.final_match_score);
 
-        // 6. Final response
         res.status(200).json({
             success: true,
             total_matches: matchResults.length,

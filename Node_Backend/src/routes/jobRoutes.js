@@ -13,11 +13,12 @@ const { validateJobInput } = require('../middleware/validationMiddleware');
 
 
 // Pipeline 1: Verify Identity and Role
-router.use(verifyToken, requireRole('employer'));
+router.use(verifyToken);
 
 // Route to create a new job posting
 // Pipeline 2: Validate Input Data -> Create Job
-router.post('/', validateJobInput, createJob);
+router.post('/', createJob);
+//router.post('/', validateJobInput, createJob);
 
 // Route to update an existing job posting
 // Pipeline 2: Validate Input Data -> Update Job

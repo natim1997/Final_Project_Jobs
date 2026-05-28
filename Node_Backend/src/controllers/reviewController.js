@@ -1,7 +1,7 @@
 const { db } = require('../config/firebase');
 
 /**
- * Adds a review and updates the target's average rating.
+ * Adds a review and updates the target's average rating (stars).
  */
 const addReview = async (req, res) => {
     try {
@@ -11,7 +11,7 @@ const addReview = async (req, res) => {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-        // 1. Save the full review to the 'reviews' node
+        // 1. Save the full review to the 'reviews' node in Firebase
         const newReviewRef = db.ref('reviews').push();
         const reviewData = {
             from_id,
@@ -24,19 +24,18 @@ const addReview = async (req, res) => {
         await newReviewRef.set(reviewData);
 
         // 2. Update the summarized rating in the target's profile
-        // Determine the path: is it a job or a candidate being rated?
         const targetPath = type === 'candidate_to_job' ? `jobs/${to_id}` : `candidates/${to_id}`;
         const targetRef = db.ref(`${targetPath}/rating_summary`);
 
-        // Fetch current summary
+        // Fetch current summary data from Firebase
         const snapshot = await targetRef.once('value');
         let { average_rating = 0, total_reviews = 0 } = snapshot.val() || {};
 
-        // Calculate new average
+        // Calculate the new math average rating
         const newTotal = total_reviews + 1;
         const newAverage = ((average_rating * total_reviews) + rating) / newTotal;
 
-        // Save updated summary
+        // Save the updated rating summary back to Firebase
         await targetRef.update({
             average_rating: Number(newAverage.toFixed(1)),
             total_reviews: newTotal,
@@ -50,7 +49,7 @@ const addReview = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(" Error adding review:", error);
+        console.error("Error adding review:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 };

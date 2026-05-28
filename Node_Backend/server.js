@@ -12,6 +12,9 @@ require('./src/config/firebase');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust Google's Load Balancer to get the real user IP
+app.set('trust proxy', 1);
+
 // ==========================================
 // Core Security Middleware
 // ==========================================

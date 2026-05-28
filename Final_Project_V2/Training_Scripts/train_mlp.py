@@ -6,7 +6,7 @@ import joblib
 
 def train_mlp_model(data_path, model_output_path):
     """
-    Loads the 13-feature dataset, trains an MLP Neural Network (Meta-Learner),
+    Loads the dataset, filters out unused features, trains an MLP Neural Network,
     evaluates it, and saves the trained model.
     """
     print(f"Loading data from {data_path}...")
@@ -17,7 +17,12 @@ def train_mlp_model(data_path, model_output_path):
         return
 
     # Separate features (X) from the target label (y)
-    X = df.drop('Actual_Label', axis=1)
+    # CRITICAL FIX: Explicitly drop features we no longer use in production
+    features_to_drop = ['Actual_Label', 'Military_Bonus', 'Education_Score']
+    
+    # Drop only if they exist in the dataframe to prevent errors
+    existing_drops = [col for col in features_to_drop if col in df.columns]
+    X = df.drop(columns=existing_drops) 
     y = df['Actual_Label']
 
     print("Splitting data into 80% training and 20% testing...")
@@ -46,7 +51,8 @@ def train_mlp_model(data_path, model_output_path):
     print("Done! The MLP Meta-Learner is ready to judge.")
 
 if __name__ == "__main__":
-    INPUT_CSV = "mlp_training_data.csv"
-    OUTPUT_MODEL = "mlp_model.pkl"
+    # Point to the correct relative paths inside your project structure
+    INPUT_CSV = "Data/mlp_training_data.csv"
+    OUTPUT_MODEL = "Models/mlp_model.pkl"
     
     train_mlp_model(INPUT_CSV, OUTPUT_MODEL)

@@ -1,9 +1,19 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey.json');
 
-// Initialize Firebase Admin with the database URL
+// Simple english comment: Load credentials safely from environment variables in production, or local file in development
+let credentialData;
+
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  // If running in Google Cloud Run, parse the JSON string from environment variables
+  credentialData = admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT));
+} else {
+  // If running locally on your Lenovo, use the local file
+  const serviceAccount = require('./serviceAccountKey.json');
+  credentialData = admin.credential.cert(serviceAccount);
+}
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: credentialData,
   databaseURL: "https://jobmatcherproject-default-rtdb.firebaseio.com/"
 });
 

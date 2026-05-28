@@ -1,14 +1,11 @@
 const { db } = require('../config/firebase');
 
 /**
- * Saves or updates a candidate profile in the Firebase Realtime Database.
- * @param {Object} req - The HTTP request object from the Android app
- * @param {Object} res - The HTTP response object
+ * Saves or updates a candidate profile based on the new wizard design.
+ * Handles grouped skills chips and structured experience array.
  */
 const saveCandidate = async (req, res) => {
     try {
-        // In a real app, candidateId comes from Firebase Auth token.
-        // For now, we expect the app to send it in the JSON body.
         const candidateId = req.body.candidateId; 
         const candidateData = req.body.candidate;
 
@@ -18,8 +15,34 @@ const saveCandidate = async (req, res) => {
             });
         }
 
-        // Save the data to Firebase under the 'candidates' node
-        await db.ref(`candidates/${candidateId}`).set(candidateData);
+        // Map incoming fields to the new flexible wizard schema
+        // This prevents crashes if optional fields are omitted or skipped
+        const updatedProfile = {
+            personal_info: {
+                full_name: candidateData.personal_info?.full_name || "Unknown",
+                phone: candidateData.personal_info?.phone || "",
+                email: candidateData.personal_info?.email || "",
+                city: candidateData.personal_info?.city || "",
+                max_distance: candidateData.personal_info?.max_distance || 15
+            },
+            // Handle skipped schedule selection (default to always available)
+            availability: candidateData.availability || { is_always_available: true },
+            skills: {
+                languages: candidateData.skills?.languages || [],
+                licenses: candidateData.skills?.licenses || [],
+                tools: candidateData.skills?.tools || [],
+                tech_stack: candidateData.skills?.tech_stack || [],
+                certifications: candidateData.skills?.certifications || []
+            },
+            // Structured array of objects: [{ role: "Waiter", years: 3 }]
+            experience: candidateData.experience || [], 
+            bio: candidateData.bio || "",
+            cv_url: candidateData.cv_url || null,
+            updated_at: Date.now()
+        };
+
+        // Save the structured data to Firebase under the candidates node
+        await db.ref(`candidates/${candidateId}`).set(updatedProfile);
 
         res.status(200).json({ 
             status: "success",
@@ -27,7 +50,7 @@ const saveCandidate = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(" Error saving candidate to Firebase:", error);
+        console.error("Error saving candidate to Firebase:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 };

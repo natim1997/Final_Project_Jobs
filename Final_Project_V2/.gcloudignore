@@ -1,0 +1,7 @@
+# ignore virtual environment and cache files to speed up upload
+venv/
+env/
+__pycache__/
+*.pyc
+.git/
+.gitignore

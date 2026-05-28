@@ -32,7 +32,8 @@ def prepare_dataset(csv_path):
     return train_dataset, eval_dataset
 
 def main():
-    dataset_path = "ai_training_dataset.csv"
+    # Points directly to the clean generated dataset directory
+    dataset_path = "Data/ai_training_dataset.csv"
     model_name = "xlm-roberta-base"
     output_dir = "./saved_matching_model"
     
@@ -40,15 +41,12 @@ def main():
     train_dataset, eval_dataset = prepare_dataset(dataset_path)
     
     # 2. Initialize the Tokenizer
-    # XLM-RoBERTa tokenizer handles multiple languages automatically
     print(f"Loading tokenizer for {model_name}...")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
     def tokenize_function(examples):
         """
         Tokenizes the job description and the CV text together.
-        The tokenizer automatically inserts separation tokens between them
-        so the model learns to compare the two texts.
         """
         return tokenizer(
             examples["Job_Description"], 
@@ -63,22 +61,21 @@ def main():
     tokenized_eval = eval_dataset.map(tokenize_function, batched=True)
     
     # 3. Initialize the Model
-    # We use num_labels=2 because our classification is binary (1=Match, 0=No Match)
     print(f"Loading pre-trained model {model_name}...")
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
     
-    # 4. Define Training Arguments
-    # These hyperparameters control how the model learns
+   # 4. Define Training Arguments
     training_args = TrainingArguments(
         output_dir="./results",
         eval_strategy="epoch",
-        save_strategy="epoch",
+        save_strategy="no",           
         learning_rate=2e-5,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         num_train_epochs=3,
         weight_decay=0.01,
-        load_best_model_at_end=True,
+        load_best_model_at_end=False,  
+        save_only_model=True,         
     )
     
     # 5. Initialize the Trainer

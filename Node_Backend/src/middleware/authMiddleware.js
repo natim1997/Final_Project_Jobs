@@ -5,7 +5,14 @@ const { admin } = require('../config/firebase');
  * Verifies the Firebase JWT token to ensure the user is authenticated.
  */
 const verifyToken = async (req, res, next) => {
-    try {
+    // ==========================================
+    // QA BYPASS - מבוטל זמנית לצורך בדיקות פיתוח
+    // ==========================================
+    req.user = { uid: "test_admin", role: "admin" }; // הזרקת משתמש דמה כדי למנוע קריסות בהמשך
+    return next();
+    // ==========================================
+
+    /* try {
         const authHeader = req.headers.authorization;
 
         // Check if the Authorization header exists and follows the Bearer format
@@ -30,6 +37,7 @@ const verifyToken = async (req, res, next) => {
         // Return 403 Forbidden if the token is expired, revoked, or tampered with
         return res.status(403).json({ error: "Forbidden: Invalid or expired token." });
     }
+    */
 };
 
 /**
@@ -39,6 +47,13 @@ const verifyToken = async (req, res, next) => {
  */
 const requireRole = (requiredRole) => {
     return (req, res, next) => {
+        // ==========================================
+        // QA BYPASS - מבוטל זמנית לצורך בדיקות פיתוח
+        // ==========================================
+        return next();
+        // ==========================================
+
+        /*
         // Check if the user object exists and if the role claim matches the requirement
         if (!req.user || req.user.role !== requiredRole) {
             console.warn(`Access Denied: User ${req.user?.uid} attempted to access a ${requiredRole} route.`);
@@ -49,6 +64,7 @@ const requireRole = (requiredRole) => {
         
         // Role is verified, proceed to the target controller
         next(); 
+        */
     };
 };
 

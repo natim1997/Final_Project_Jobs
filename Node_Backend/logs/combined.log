@@ -138,3 +138,127 @@
 {"level":"info","message":"::1 - - [26/May/2026:07:00:28 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2014 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 10:00:28"}
 {"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-26 10:03:46"}
 {"level":"info","message":"::1 - - [26/May/2026:07:04:00 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 2014 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-26 10:04:00"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-29 18:13:34"}
+{"level":"error","message":"Error extracting CV: pdfParse is not a function","timestamp":"2026-05-29 18:16:24"}
+{"level":"info","message":"::1 - - [29/May/2026:15:16:25 +0000] \"POST /api/extract-cv HTTP/1.1\" 500 42 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-29 18:16:25"}
+{"level":"error","message":"Error extracting CV: pdfParse is not a function","timestamp":"2026-05-29 18:20:31"}
+{"level":"info","message":"::1 - - [29/May/2026:15:20:31 +0000] \"POST /api/extract-cv HTTP/1.1\" 500 42 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-29 18:20:31"}
+{"level":"error","message":"Error extracting CV: pdfParse is not a function","timestamp":"2026-05-29 18:23:11"}
+{"level":"info","message":"::1 - - [29/May/2026:15:23:11 +0000] \"POST /api/extract-cv HTTP/1.1\" 500 42 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-29 18:23:11"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-29 18:47:20"}
+{"level":"error","message":"Error extracting CV: parseFunction is not a function","timestamp":"2026-05-29 18:47:40"}
+{"level":"info","message":"::1 - - [29/May/2026:15:47:40 +0000] \"POST /api/extract-cv HTTP/1.1\" 500 42 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-29 18:47:40"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-29 18:50:38"}
+{"level":"error","message":"Error extracting CV: pdf-parse is not a function! It is a object with keys: AbortException,FormatError,InvalidPDFException,Line,LineDirection,LineStore,PDFParse,PasswordException,Point,Rectangle,ResponseException,Shape,Table,UnknownErrorException,VerbosityLevel,getException","timestamp":"2026-05-29 18:50:46"}
+{"level":"info","message":"::1 - - [29/May/2026:15:50:46 +0000] \"POST /api/extract-cv HTTP/1.1\" 500 42 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-29 18:50:46"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-29 18:52:55"}
+{"level":"info","message":"::1 - - [29/May/2026:15:53:04 +0000] \"POST /api/extract-cv HTTP/1.1\" 200 1171 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-29 18:53:04"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-30 13:49:28"}
+{"level":"info","message":"::1 - - [30/May/2026:10:51:22 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 13:51:22"}
+{"level":"info","message":"::1 - - [30/May/2026:10:54:17 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 990 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 13:54:17"}
+{"level":"info","message":"::1 - - [30/May/2026:10:58:06 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 990 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 13:58:06"}
+{"level":"info","message":"::1 - - [30/May/2026:11:00:22 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 990 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:00:22"}
+{"level":"info","message":"::1 - - [30/May/2026:11:05:54 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 990 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:05:54"}
+{"level":"info","message":"::1 - - [30/May/2026:11:06:53 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 2040 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:06:53"}
+{"level":"info","message":"::1 - - [30/May/2026:11:11:43 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 2040 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:11:43"}
+{"level":"info","message":"::1 - - [30/May/2026:11:13:27 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 2040 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:13:27"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-30 14:17:08"}
+{"level":"info","message":"::1 - - [30/May/2026:11:17:22 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 2941 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:17:22"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-30 14:24:05"}
+{"level":"info","message":"::1 - - [30/May/2026:11:24:25 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:24:25"}
+{"level":"info","message":"::1 - - [30/May/2026:11:24:35 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:24:35"}
+{"level":"info","message":"::1 - - [30/May/2026:11:25:08 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:25:08"}
+{"level":"info","message":"::1 - - [30/May/2026:11:25:29 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:25:29"}
+{"level":"info","message":"::1 - - [30/May/2026:11:25:46 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:25:46"}
+{"level":"info","message":"::1 - - [30/May/2026:11:25:53 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:25:53"}
+{"level":"info","message":"::1 - - [30/May/2026:11:26:01 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:26:01"}
+{"level":"info","message":"::1 - - [30/May/2026:11:26:13 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:26:13"}
+{"level":"info","message":"::1 - - [30/May/2026:11:29:10 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:29:10"}
+{"level":"info","message":"::1 - - [30/May/2026:11:29:20 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:29:20"}
+{"level":"info","message":"::1 - - [30/May/2026:11:29:27 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:29:27"}
+{"level":"info","message":"::1 - - [30/May/2026:11:29:34 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:29:34"}
+{"level":"info","message":"::1 - - [30/May/2026:11:31:39 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 13035 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:31:39"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-30 14:46:09"}
+{"level":"info","message":"::1 - - [30/May/2026:11:46:50 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 13069 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:46:50"}
+{"level":"info","message":"::1 - - [30/May/2026:11:57:27 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 13041 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 14:57:27"}
+{"level":"info","message":"::1 - - [30/May/2026:12:03:10 +0000] \"POST /api/candidates HTTP/1.1\" 400 73 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 15:03:10"}
+{"level":"info","message":"::1 - - [30/May/2026:12:04:54 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 15:04:54"}
+{"level":"info","message":"::1 - - [30/May/2026:12:05:40 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 13819 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 15:05:40"}
+{"level":"info","message":"::1 - - [30/May/2026:12:06:51 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 13031 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 15:06:51"}
+{"level":"info","message":"::1 - - [30/May/2026:12:12:00 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 13031 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 15:12:00"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-30 16:14:02"}
+{"level":"info","message":"::1 - - [30/May/2026:13:15:01 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 13031 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 16:15:01"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-05-30 17:25:22"}
+{"level":"info","message":"::1 - - [30/May/2026:14:25:30 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:25:30"}
+{"level":"info","message":"::1 - - [30/May/2026:14:25:48 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:25:48"}
+{"level":"info","message":"::1 - - [30/May/2026:14:25:55 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:25:55"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:05 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:05"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:13 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:13"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:20 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:20"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:25 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:25"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:32 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:32"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:38 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:38"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:44 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:44"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:49 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:49"}
+{"level":"info","message":"::1 - - [30/May/2026:14:26:55 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:26:55"}
+{"level":"info","message":"::1 - - [30/May/2026:14:27:01 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:27:01"}
+{"level":"info","message":"::1 - - [30/May/2026:14:27:10 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:27:10"}
+{"level":"info","message":"::1 - - [30/May/2026:14:27:15 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:27:15"}
+{"level":"info","message":"::1 - - [30/May/2026:14:28:51 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:28:51"}
+{"level":"info","message":"::1 - - [30/May/2026:14:28:59 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:28:59"}
+{"level":"info","message":"::1 - - [30/May/2026:14:29:05 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:29:05"}
+{"level":"info","message":"::1 - - [30/May/2026:14:29:12 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:29:12"}
+{"level":"info","message":"::1 - - [30/May/2026:14:29:24 +0000] \"POST /api/jobs HTTP/1.1\" 201 84 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-05-30 17:29:24"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-06-01 18:31:19"}
+{"level":"info","message":"::1 - - [01/Jun/2026:15:32:36 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 18766 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-06-01 18:32:36"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-06-01 19:16:45"}
+{"level":"info","message":"::1 - - [01/Jun/2026:16:17:59 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 18766 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 19:17:59"}
+{"level":"info","message":"Node.js Server started and running on port 3000","timestamp":"2026-06-01 19:56:49"}
+{"level":"info","message":"::1 - - [01/Jun/2026:16:58:20 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 19:58:20"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:02:19 +0000] \"GET /api/matches/test_candidate_777 HTTP/1.1\" 404 32 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 20:02:19"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:02:44 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 20:02:44"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:02:56 +0000] \"GET /api/matches/test_candidate_777 HTTP/1.1\" 404 32 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 20:02:56"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:07:05 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 200 16747 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 20:07:05"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:07:49 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 404 32 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 20:07:49"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:17:19 +0000] \"POST /api/candidates/test_candidate_456 HTTP/1.1\" 404 173 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-06-01 20:17:19"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-01 20:17:28"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:17:33 +0000] \"POST /api/candidates/test_candidate_456 HTTP/1.1\" 404 173 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-06-01 20:17:33"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:18:52 +0000] \"POST /api/candidates/test_candidate_456 HTTP/1.1\" 404 173 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-06-01 20:18:52"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:19:18 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-06-01 20:19:18"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:20:01 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 18766 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-01 20:20:01"}
+{"level":"info","message":"::1 - - [01/Jun/2026:17:21:11 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 200 18766 \"-\" \"PostmanRuntime/7.53.0\"","timestamp":"2026-06-01 20:21:11"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:04:37 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:04:37"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 08:17:52"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 08:27:05"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:28:19 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:28:19"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 08:29:10"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:29:45 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 404 32 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:29:45"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:31:04 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 18785 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:31:04"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:48:58 +0000] \"GET /api/matches/test_candidate_456 HTTP/1.1\" 404 32 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:48:58"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:50:12 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:50:12"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:52:01 +0000] \"GET /api/matches/cand_netanel_1997 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:52:01"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:52:45 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 304 - \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:52:45"}
+{"level":"info","message":"::1 - - [02/Jun/2026:05:54:20 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 17784 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 08:54:20"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 08:58:24"}
+{"level":"info","message":"::1 - - [02/Jun/2026:06:02:59 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 17766 \"http://127.0.0.1:5500/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36\"","timestamp":"2026-06-02 09:02:59"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 09:52:52"}
+{"level":"info","message":"::1 - - [02/Jun/2026:07:22:28 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 17766 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 10:22:28"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 10:30:41"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 10:32:45"}
+{"level":"info","message":"::1 - - [02/Jun/2026:07:33:21 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 17766 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 10:33:21"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 10:41:07"}
+{"level":"info","message":"::1 - - [02/Jun/2026:07:43:55 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 10:43:55"}
+{"level":"info","message":"::1 - - [02/Jun/2026:07:44:25 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 17807 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 10:44:25"}
+{"level":"info","message":"::1 - - [02/Jun/2026:07:57:49 +0000] \"GET /api/matches/test_candidate_123 HTTP/1.1\" 200 17757 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 10:57:49"}
+{"level":"info","message":"::1 - - [02/Jun/2026:08:04:10 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 11:04:10"}
+{"level":"info","message":"::1 - - [02/Jun/2026:08:04:44 +0000] \"GET /api/matches/test_candidate_logistics HTTP/1.1\" 200 17769 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 11:04:44"}
+{"level":"info","message":"::1 - - [02/Jun/2026:08:10:05 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 11:10:05"}
+{"level":"info","message":"::1 - - [02/Jun/2026:08:11:26 +0000] \"GET /api/matches/test_candidate_tech_99 HTTP/1.1\" 200 17772 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 11:11:26"}
+{"level":"info","message":"::1 - - [02/Jun/2026:08:22:45 +0000] \"GET /api/matches/test_candidate_tech_99 HTTP/1.1\" 200 17792 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 11:22:45"}
+{"level":"info","message":"Node.js Server started on port 3000","timestamp":"2026-06-02 14:10:09"}
+{"level":"info","message":"::1 - - [02/Jun/2026:11:10:45 +0000] \"GET /api/matches/test_candidate_tech_99 HTTP/1.1\" 200 17652 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 14:10:45"}
+{"level":"info","message":"::1 - - [02/Jun/2026:11:29:12 +0000] \"GET /api/matches/test_candidate_tech_99 HTTP/1.1\" 200 17792 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 14:29:12"}
+{"level":"info","message":"::1 - - [02/Jun/2026:11:33:17 +0000] \"GET /api/matches/test_candidate_tech_99 HTTP/1.1\" 200 17523 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 14:33:17"}
+{"level":"info","message":"::1 - - [02/Jun/2026:11:36:54 +0000] \"POST /api/candidates HTTP/1.1\" 200 82 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 14:36:54"}
+{"level":"info","message":"::1 - - [02/Jun/2026:11:37:18 +0000] \"GET /api/matches/test_candidate_junior_00 HTTP/1.1\" 200 17539 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 14:37:18"}
+{"level":"info","message":"::1 - - [02/Jun/2026:11:53:37 +0000] \"GET /api/matches/test_candidate_junior_00 HTTP/1.1\" 200 17491 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-06-02 14:53:37"}

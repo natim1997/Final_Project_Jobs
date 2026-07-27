@@ -8,7 +8,6 @@
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 ![Google Cloud Run](https://img.shields.io/badge/Cloud_Run-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
 
@@ -71,7 +70,7 @@ To ensure high accuracy in predicting job matches, the models underwent a rigoro
 | Layer | Tools |
 |---|---|
 | **Backend** | Node.js with Express |
-| **AI Service** | Python with Flask, Scikit-learn, PyTorch, and NLP models (RoBERTa, SVM, MLP) |
+| **AI Service** | Python with Flask, Scikit-learn, and NLP models (RoBERTa, SVM, MLP) |
 | **Database & Auth** | Firebase Admin SDK working against Firestore |
 | **Cloud & Runtime** | Docker and Google Cloud Run |
 

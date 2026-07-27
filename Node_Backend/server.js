@@ -9,10 +9,11 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 
 // Initialize Firebase configuration
-require('./src/config/firebase'); 
+require('./src/config/firebase');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// Use Cloud Run port or default to 8080 locally
+const PORT = process.env.PORT || 8080;
 
 // Trust proxy for correct IP detection in production
 app.set('trust proxy', 1);
@@ -22,17 +23,17 @@ app.set('trust proxy', 1);
 // ==========================================
 
 // Secure HTTP headers
-app.use(helmet()); 
+app.use(helmet());
 
 // Enable cross-origin requests for the frontend
-app.use(cors({ origin: '*' })); 
+app.use(cors({ origin: '*' }));
 
 // Enable JSON parsing for request bodies
-app.use(express.json()); 
+app.use(express.json());
 
 // Logging all requests
-app.use(morgan('combined', { 
-    stream: { write: (message) => logger.info(message.trim()) } 
+app.use(morgan('combined', {
+    stream: { write: (message) => logger.info(message.trim()) }
 }));
 
 // Limit API usage to prevent abuse
@@ -59,9 +60,6 @@ app.get('/health', (req, res) => {
 app.use('/api/candidates', require('./src/routes/candidateRoutes'));
 app.use('/api/jobs', require('./src/routes/jobRoutes'));
 app.use('/api/matches', require('./src/routes/matchRoutes'));
-app.use('/api/reviews', require('./src/routes/reviewRoutes'));
-app.use('/api/favorites', require('./src/routes/favoriteRoutes'));
-app.use('/api/chats', require('./src/routes/chatRoutes'));
 
 // ==========================================
 // CV Extraction Route
@@ -93,7 +91,9 @@ app.post('/api/extract-cv', upload.single('cv_file'), async (req, res) => {
 // ==========================================
 // Start Server
 // ==========================================
-app.listen(PORT, () => {
+
+// Listen on 0.0.0.0 so Google Cloud Run can route traffic to this container
+app.listen(PORT, '0.0.0.0', () => {
     logger.info(`Node.js Server started on port ${PORT}`);
     console.log(`Node.js Server is running on port ${PORT}`);
 });

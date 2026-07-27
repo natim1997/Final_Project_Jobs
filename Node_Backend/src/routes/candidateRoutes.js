@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { saveCandidate } = require('../controllers/candidateController');
+const multer = require('multer');
+const { createCandidate } = require('../controllers/candidateController');
 
-// POST request to save a new candidate
-// Full URL will be: POST http://localhost:3000/api/candidates
-router.post('/', saveCandidate);
+// Configure multer to hold the file in memory
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Route to create a candidate (expects 'cv_file' as the file field)
+router.post('/', upload.single('cv_file'), createCandidate);
 
 module.exports = router;

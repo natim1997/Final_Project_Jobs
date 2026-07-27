@@ -1,89 +1,93 @@
 const { db } = require('../config/firebase');
+const logger = require('../config/logger');
+const pdfParse = require('pdf-parse');
+const axios = require('axios');
+const { triggerSingleCandidateMatch } = require('../services/backgroundMatcher');
 
-/**
- * Saves or updates a candidate profile based on the new wizard design.
- * Handles grouped skills chips, structured experience, and dynamic semantic profile for AI.
- */
-const saveCandidate = async (req, res) => {
+const createCandidate = async (req, res) => {
     try {
-        const candidateId = req.body.candidateId; 
-        const candidateData = req.body.candidate;
+        // 1. Parse incoming data first to extract the frontend ID
+        let data = req.body.candidateData ? JSON.parse(req.body.candidateData) : req.body;
 
-        if (!candidateId || !candidateData) {
-            return res.status(400).json({ 
-                error: "Invalid request. Missing 'candidateId' or 'candidate' object." 
+        // 2. Use the ID from the frontend, or auth, or generate a new one
+        const userId = data.id || (req.user ? req.user.uid : db.collection('candidates').doc().id);
+
+        // 3. Point to the exact document ID in Firestore
+        const candidateRef = db.collection('candidates').doc(userId);
+
+        // 4. Fetch existing data first (read-before-write) so we never wipe fields
+        //    that aren't part of this specific request.
+        const existingDoc = await candidateRef.get();
+        const existingData = existingDoc.exists ? existingDoc.data() : {};
+
+        // 5. Extract Text from CV if provided
+        let cvText = "";
+        if (req.file) {
+            try {
+                const pdfData = await pdfParse(req.file.buffer);
+                cvText = pdfData.text.replace(/\s+/g, ' ').trim();
+                console.log("--> DEBUG PDF EXTRACTION: ", cvText.substring(0, 100)); 
+            } catch (err) {
+                logger.error("Failed to parse PDF text");
+            }
+        }
+
+        // 6. Request AI Bio Generation from Python
+        let semanticProfile = existingData.semantic_profile || "";
+        try {
+            // Forcing local server instead of process.env.AI_SERVER_URL
+            const localAiUrl = "http://127.0.0.1:5000/api/generate-bio";
+            console.log("DEBUG: Generating bio via local AI at:", localAiUrl);
+            
+            const aiResponse = await axios.post(localAiUrl, {
+                ...data,
+                extracted_cv_text: cvText
             });
+            semanticProfile = aiResponse.data.generated_bio;
+        } catch (aiErr) {
+            logger.warn("Python AI not reachable, using fallback text generation");
+            semanticProfile = `${data.bio || existingData.bio || ""} ${data.other || existingData.other || ""}`.trim();
         }
 
-        // simple english comment: Build the dynamic semantic profile for the AI model
-        let semanticParts = [];
+        // 7. Build the merged object.
+        const updatedData = {
+            ...existingData,
+            ...data,
 
-        // Add bio if exists
-        if (candidateData.bio) {
-            semanticParts.push(`About the candidate: ${candidateData.bio}`);
-        }
+            id: userId,
+            semantic_profile: semanticProfile,
+            cvName: data.cvName || (req.file ? req.file.originalname : existingData.cvName || ""),
 
-        // Add skills if they exist
-        let skillsText = [];
-        if (candidateData.skills?.languages?.length) skillsText.push(`Languages: ${candidateData.skills.languages.join(', ')}`);
-        if (candidateData.skills?.licenses?.length) skillsText.push(`Licenses: ${candidateData.skills.licenses.join(', ')}`);
-        if (candidateData.skills?.tools?.length) skillsText.push(`Tools: ${candidateData.skills.tools.join(', ')}`);
-        if (candidateData.skills?.tech_stack?.length) skillsText.push(`Tech Stack: ${candidateData.skills.tech_stack.join(', ')}`);
-        if (candidateData.skills?.certifications?.length) skillsText.push(`Certifications: ${candidateData.skills.certifications.join(', ')}`);
-        
-        if (skillsText.length > 0) {
-            semanticParts.push(`Skills: ${skillsText.join('. ')}`);
-        }
+            // Server-owned fields: never trust client input for these
+            jobMatches: existingData.jobMatches || [],
+            rating: existingData.rating ?? 0,
+            ratingsCount: existingData.ratingsCount ?? 0,
 
-        // Add extracted CV text OR manual experience
-        if (candidateData.cv_extracted_text) {
-            semanticParts.push(`Professional Experience and Resume: ${candidateData.cv_extracted_text}`);
-        } else if (candidateData.experience && candidateData.experience.length > 0) {
-            // fallback if they entered experience manually
-            const expArray = candidateData.experience.map(exp => `${exp.role} (${exp.years} years)`);
-            semanticParts.push(`Experience: ${expArray.join(', ')}`);
-        }
-
-        // Combine everything into one rich text string
-        const full_semantic_profile = semanticParts.join(' | ');
-
-        // simple english comment: Map incoming fields to the new flexible wizard schema
-        const updatedProfile = {
-            personal_info: {
-                full_name: candidateData.personal_info?.full_name || "Unknown",
-                phone: candidateData.personal_info?.phone || "",
-                email: candidateData.personal_info?.email || "",
-                city: candidateData.personal_info?.city || "",
-                max_distance: candidateData.personal_info?.max_distance || 15
-            },
-            availability: candidateData.availability || { is_always_available: true },
-            skills: {
-                languages: candidateData.skills?.languages || [],
-                licenses: candidateData.skills?.licenses || [],
-                tools: candidateData.skills?.tools || [],
-                tech_stack: candidateData.skills?.tech_stack || [],
-                certifications: candidateData.skills?.certifications || []
-            },
-            experience: candidateData.experience || [], 
-            bio: candidateData.bio || "",
-            cv_url: candidateData.cv_url || null,
-            cv_extracted_text: candidateData.cv_extracted_text || null,
-            full_semantic_profile: full_semantic_profile, // The complete text chunk for RoBERTa
-            updated_at: Date.now()
+            // Keep original creation timestamp if it exists, otherwise set it now
+            createdAt: existingData.createdAt || Date.now(),
+            updatedAt: Date.now()
         };
 
-        // simple english comment: Save the structured data to Firebase under the candidates node
-        await db.ref(`candidates/${candidateId}`).set(updatedProfile);
+        // 8. Save back to Firestore
+        await candidateRef.set(updatedData);
 
-        res.status(200).json({ 
-            status: "success",
-            message: "Candidate profile saved successfully to Firebase!" 
+        // 9. Run the match engine and WAIT for it to finish before responding.
+        if (typeof triggerSingleCandidateMatch === 'function') {
+            try {
+                await triggerSingleCandidateMatch(userId);
+            } catch (matchErr) {
+                logger.error(`Match engine failed for candidate ${userId}: ${matchErr.message}`);
+            }
+        }
+
+        return res.status(200).json({
+            message: "Candidate created/updated successfully with AI profile",
+            candidateId: userId
         });
 
     } catch (error) {
-        console.error("Error saving candidate to Firebase:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        logger.error(`Error in createCandidate: ${error.message}`);
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
-
-module.exports = { saveCandidate };
+module.exports = { createCandidate };

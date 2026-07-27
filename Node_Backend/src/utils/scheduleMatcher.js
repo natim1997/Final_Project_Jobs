@@ -1,76 +1,45 @@
 /**
- * Convert HH:MM string to total minutes from midnight.
- * Example: "08:30" -> 510 minutes.
+ * Schedule Matcher - Updated Version
+ * 
+ * Checks if the job's date matches the candidate's available days.
+ * Returns 100 if it's a match (or if candidate is always available).
+ * Returns 0 if the candidate is not available on the job's day.
  */
-const timeToMinutes = (timeStr) => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 60 + minutes;
-};
-
-/**
- * Calculates match based on candidate's BUSY slots.
- * Returns 100 if candidate is completely free during job hours.
- */
-const calculateScheduleMatch = (jobAvailability, candidateAvailability) => {
-    // If candidate skipped or is always available, return perfect match
-    if (candidateAvailability.is_always_available) {
+const calculateScheduleMatch = (job, candidate) => {
+    // 1. Get candidate's available days
+    // Support both full candidate object or just the array if passed directly
+    const availableDays = candidate.availableDays || candidate || [];
+    
+    // If it's not an array or if it's empty, candidate is available every day
+    if (!Array.isArray(availableDays) || availableDays.length === 0) {
         return 100;
     }
 
-    let totalRequiredMinutes = 0;
-    let totalOverlapWithBusyMinutes = 0;
+    // 2. Get the job's date (timestamp in milliseconds)
+    // Support both full job object or just the date field if passed directly
+    const jobDateMillis = job.date || job;
 
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-
-    days.forEach(day => {
-        const jobBlocks = jobAvailability[day] || [];
-        // In the new layout, candidate blocks represent busy times
-        const busyBlocks = candidateAvailability.busy_slots || [];
-        
-        // Filter busy slots for the specific day
-        const dayBusyBlocks = busyBlocks.filter(slot => slot.day.toLowerCase() === day);
-
-        jobBlocks.forEach(jBlock => {
-            const jStart = timeToMinutes(jBlock.start);
-            const jEnd = timeToMinutes(jBlock.end);
-            totalRequiredMinutes += (jEnd - jStart);
-
-            let blockOverlap = 0;
-
-            dayBusyBlocks.forEach(bBlock => {
-                const bStart = timeToMinutes(bBlock.start);
-                const bEnd = timeToMinutes(bBlock.end);
-
-                // Find intersection with busy hours
-                const maxStart = Math.max(jStart, bStart);
-                const minEnd = Math.min(jEnd, bEnd);
-                
-                if (maxStart < minEnd) {
-                    blockOverlap += (minEnd - maxStart);
-                }
-            });
-
-            totalOverlapWithBusyMinutes += blockOverlap;
-        });
-    });
-
-    if (totalRequiredMinutes === 0) {
+    // If the job does not have a date, allow it to pass
+    if (!jobDateMillis || isNaN(Number(jobDateMillis))) {
         return 100; 
     }
 
-    // Match decreases the more the candidate is busy during job hours
-    let freeMinutes = totalRequiredMinutes - totalOverlapWithBusyMinutes;
-    if (freeMinutes < 0) freeMinutes = 0;
+    // 3. Convert timestamp to a JavaScript Date object
+    const jobDate = new Date(Number(jobDateMillis));
 
-    let matchPercentage = (freeMinutes / totalRequiredMinutes) * 100;
+    // 4. Get the day index (0 = Sunday, 1 = Monday, etc.)
+    const dayIndex = jobDate.getDay();
 
-    // Apply flexibility bonus if applicable
-    if (matchPercentage < 100 && (jobAvailability.is_flexible || candidateAvailability.is_flexible)) {
-        matchPercentage += 20; 
-        if (matchPercentage > 100) matchPercentage = 100; 
+    // 5. Convert the index to a Hebrew string
+    const hebrewDays = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+    const jobDayInHebrew = hebrewDays[dayIndex];
+
+    // 6. Check if the job's day is in the candidate's available days
+    if (availableDays.includes(jobDayInHebrew)) {
+        return 100; // Perfect match
+    } else {
+        return 0; // No match - Hard Filter will block it
     }
-
-    return Math.round(matchPercentage);
 };
 
 module.exports = { calculateScheduleMatch };

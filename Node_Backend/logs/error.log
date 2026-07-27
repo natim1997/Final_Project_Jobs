@@ -6,3 +6,12 @@
 {"level":"error","message":"Error extracting CV: pdfParse is not a function","timestamp":"2026-05-29 18:23:11"}
 {"level":"error","message":"Error extracting CV: parseFunction is not a function","timestamp":"2026-05-29 18:47:40"}
 {"level":"error","message":"Error extracting CV: pdf-parse is not a function! It is a object with keys: AbortException,FormatError,InvalidPDFException,Line,LineDirection,LineStore,PDFParse,PasswordException,Point,Rectangle,ResponseException,Shape,Table,UnknownErrorException,VerbosityLevel,getException","timestamp":"2026-05-29 18:50:46"}
+{"level":"error","message":"Failed to parse PDF for candidate -Ov0O1Dn90VkpT0vzYr9: Invalid PDF structure","timestamp":"2026-06-13 17:30:27"}
+{"level":"error","message":"Failed to parse PDF for candidate -Ov0O9f2u7-2y2ADbtB0: Invalid PDF structure","timestamp":"2026-06-13 17:31:01"}
+{"level":"error","message":"Error creating job: Id is not defined","timestamp":"2026-07-05 20:35:51"}
+{"level":"error","message":"Error creating job: Id is not defined","timestamp":"2026-07-05 20:36:10"}
+{"level":"error","message":"Error creating job: Id is not defined","timestamp":"2026-07-05 20:36:40"}
+{"level":"error","message":"Error creating job: Id is not defined","timestamp":"2026-07-05 20:38:31"}
+{"level":"error","message":"Failed to parse PDF text","timestamp":"2026-07-23 10:56:59"}
+{"level":"error","message":"Failed to parse PDF text","timestamp":"2026-07-23 11:01:56"}
+{"level":"error","message":"Failed to parse PDF text","timestamp":"2026-07-23 11:04:26"}

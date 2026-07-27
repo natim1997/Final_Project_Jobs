@@ -1,74 +1,102 @@
-const { calculateScheduleMatch } = require('./scheduleMatcher');
+// ==========================================
+// Match Calculator Utility
+// ==========================================
 
-/**
- * Weighted Score Calculator adapted for dynamic weighting.
- * Handles both technical jobs (skills matching) and general jobs (100% semantic matching).
- */
-const calculateFinalMatchScore = (job, candidate, aiSemanticScore) => {
+//  Import the external coordinates dictionary
+const cityCoordinates = require('./israelCities.js');
+
+// Helper function to extract city name from a full address string
+const extractCityFromAddress = (addressString) => {
+    if (!addressString) return "";
     
-    // 1. Strict Schedule Filter
-    let scheduleScore = 100;
-    if (job.availability && candidate.availability) {
-        scheduleScore = calculateScheduleMatch(job.availability, candidate.availability);
+    // Loop through all the cities in our dictionary
+    for (const city of Object.keys(cityCoordinates)) {
+        // Check if the city name is inside the address string
+        if (addressString.includes(city)) {
+            return city;
+        }
     }
-    if (scheduleScore < 100) return { finalScore: 0, status: "REJECTED_SCHEDULE" };
+    return ""; // Return empty string if no city is found
+};
 
-    // 2. Extract and combine grouped skills chips into a single flat array
-    const candidateSkills = [
-        ...(candidate.skills?.tech_stack || []),
-        ...(candidate.skills?.tools || []),
-        ...(candidate.skills?.certifications || []),
-        ...(candidate.skills?.languages || [])
-    ];
+// Calculate distance between two coordinates in kilometers
+const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    return R * c; // Distance in km
+};
+
+const calculateFinalMatchScore = (job, candidate, rawAiScore) => {
     
-    // Combine job requirements keywords
-    const jobKeywords = [
-        ...(job.requirements?.tech_stack || []),
-        ...(job.requirements?.tools || []),
-        ...(job.requirements?.certifications || []),
-        ...(job.requirements?.keywords || [])
-    ];
-
-    let skillScore = 0;
-    let finalAiWeight = 0.6;
-    let finalSkillsWeight = 0.4;
-
-    // 3. Dynamic Weighting Logic
-    if (jobKeywords.length > 0) {
-        // Job requires specific skills -> apply 60/40 split
-        const matched = jobKeywords.filter(kw => 
-            candidateSkills.some(s => String(s).toLowerCase().includes(String(kw).toLowerCase()))
-        );
-        skillScore = (matched.length / jobKeywords.length) * 100;
-    } else {
-        // Job has no technical keywords (e.g., general labor/waiter) 
-        // -> AI semantic score dictates 100% of the match
-        skillScore = 0;
-        finalAiWeight = 1.0;
-        finalSkillsWeight = 0.0;
+    // Ensure AI score is a valid number
+    let baseScore = parseFloat(rawAiScore);
+    if (isNaN(baseScore)) {
+        baseScore = 0;
     }
 
-    // 4. Final Weighting Calculation
-    let finalScore = (aiSemanticScore * finalAiWeight) + (skillScore * finalSkillsWeight);
-    finalScore = Math.round(finalScore);
+    // Get city strings. If city field is missing, try to extract it from the address
+    const candidateCity = (candidate.city || extractCityFromAddress(candidate.address) || "").trim();
+    const jobCity = (job.city || job.location || extractCityFromAddress(job.address) || "").trim();
+    
+    // Default user radius to 20 if not specified
+    const userRadius = candidate.searchRadius || 20; 
+    let finalScore = baseScore;
+    let locationReason = "Location match";
+    let status = "NO MATCH";
 
-    // Cap the score at 98 for realism
-    if (finalScore > 98) finalScore = 98;
+    //Check if we found coordinates for both cities
+    if (cityCoordinates[candidateCity] && cityCoordinates[jobCity]) {
+        const candCoords = cityCoordinates[candidateCity];
+        const jobCoords = cityCoordinates[jobCity];
+        
+        const distanceKm = getDistanceFromLatLonInKm(candCoords.lat, candCoords.lng, jobCoords.lat, jobCoords.lng);
+        
+        // Strict block if distance exceeds search radius
+        if (distanceKm > userRadius) {
+            return {
+                finalScore: 0,
+                status: "NO MATCH",
+                breakdown: {
+                    aiBaseScore: Math.round(baseScore),
+                    locationPenalty: "BLOCKED",
+                    info: `Blocked: Job is ${Math.round(distanceKm)}km away (exceeds ${userRadius}km radius)`
+                }
+            };
+        } else {
+            locationReason = `Distance: ${Math.round(distanceKm)}km (Within ${userRadius}km radius)`;
+        }
+    } 
+    else if (candidateCity && jobCity && candidateCity !== jobCity) {
+        // Fallback if city is missing from the external dictionary
+        finalScore = Math.max(0, baseScore - 10); 
+        locationReason = `Cities do not match (Fallback penalty): ${candidateCity} vs ${jobCity}`;
+    }
+    else if (!jobCity) {
+        // If we still don't know the job location, apply a small penalty
+        finalScore = Math.max(0, baseScore - 5);
+        locationReason = `Job location unknown or not in dictionary`;
+    }
 
-    // Determine Status based on final score
-    let matchStatus = "NO MATCH";
+    // Determine final status based on score
     if (finalScore >= 75) {
-        matchStatus = "MATCH";
+        status = "MATCH";
     } else if (finalScore >= 40) {
-        matchStatus = "POTENTIAL";
+        status = "POTENTIAL";
     }
 
     return {
-        finalScore: finalScore,
-        status: matchStatus,
+        finalScore: Math.round(finalScore),
+        status: status,
         breakdown: {
-            aiSemanticWeight: Math.round(aiSemanticScore * finalAiWeight),
-            skillsWeight: Math.round(skillScore * finalSkillsWeight)
+            "aiBaseScore": Math.round(baseScore),
+            "locationPenalty": baseScore - finalScore,
+            "info": locationReason
         }
     };
 };

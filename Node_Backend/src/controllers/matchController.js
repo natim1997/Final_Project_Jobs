@@ -5,92 +5,16 @@ const { calculateScheduleMatch } = require('../utils/scheduleMatcher');
 const logger = require('../config/logger');
 
 // ==========================================
-// Matchmaking Helper Functions & Normalization
+// Matchmaking Helper Functions (Adapted for Flat Schema)
 // ==========================================
 
-/**
- * Normalizes raw job data from Firebase into a strict structured object.
- */
-const normalizeJobData = (rawJob, jobId) => {
-    const description = rawJob.description || rawJob.text_fields?.description || "";
-    const cleanDescription = description.replace(/^"|"$/g, '');
-
-    return {
-        jobId: jobId,
-        description: cleanDescription,
-        apparel_requirements: rawJob.apparel_requirements || [],
-        availability: rawJob.availability || null,
-        characteristics: rawJob.characteristics || {},
-        dealbreakers: rawJob.dealbreakers || {},
-        location: {
-            lat: rawJob.location?.lat || rawJob.basic_info?.lat || null,
-            lng: rawJob.location?.lng || rawJob.basic_info?.lng || null
-        },
-        requirements: {
-            tech_stack: rawJob.requirements?.tech_stack || [],
-            languages: rawJob.requirements?.languages || [],
-            mandatory_skills: rawJob.requirements?.mandatory_skills || [], // New field for hard requirements
-            min_experience_years: rawJob.requirements?.min_experience_years || 0
-        },
-        basic_info: {
-            job_title: rawJob.basic_info?.job_title || "Position",
-            company_name: rawJob.basic_info?.company_name || "Unknown Company",
-            address: rawJob.basic_info?.address || rawJob.basic_info?.location_city || ""
-        }
-    };
-};
-
-/**
- * Calculates distance in KM between two points.
- */
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; 
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-};
-
-/**
- * Checks for strict dealbreakers based on candidate settings.
- */
-const failsDealbreakers = (candidatePrefs, jobCharacteristics) => {
-    if (!candidatePrefs || !jobCharacteristics) return false;
-    for (const [key, pref] of Object.entries(candidatePrefs)) {
-        if (pref.requested === true && pref.is_dealbreaker === true) {
-            if (jobCharacteristics[key] !== true) {
-                return true; 
-            }
-        }
-    }
-    return false;
-};
-
-/**
- * simple english comment: Checks if the job has mandatory skills/certifications that the candidate is missing.
- */
-const failsMandatoryRequirements = (candidateSkills, jobRequirements) => {
-    if (jobRequirements && jobRequirements.mandatory_skills && jobRequirements.mandatory_skills.length > 0) {
-        // Collect all candidate skills into one flat array for easy checking
-        const candidateAllSkills = [
-            ...(candidateSkills?.languages || []),
-            ...(candidateSkills?.tools || []),
-            ...(candidateSkills?.tech_stack || []),
-            ...(candidateSkills?.certifications || []),
-            ...(candidateSkills?.licenses || [])
-        ].map(s => s.toLowerCase().trim());
-
-        // Check if every mandatory requirement exists in the candidate's skills
-        for (const reqSkill of jobRequirements.mandatory_skills) {
-            if (!candidateAllSkills.includes(reqSkill.toLowerCase().trim())) {
-                return true; // Failed a mandatory requirement
-            }
-        }
-    }
-    return false;
+const failsLicenseDealbreaker = (candidateLicenses, jobText) => {
+    // check if job requires a license and candidate has one
+    const licenseKeywords = ["driver's license", "רישיון נהיגה", "רישיון"];
+    const needsLicense = licenseKeywords.some(kw => jobText.toLowerCase().includes(kw));
+    const hasLicense = candidateLicenses && candidateLicenses.length > 0;
+    
+    return needsLicense && !hasLicense;
 };
 
 // ==========================================
@@ -100,87 +24,130 @@ const failsMandatoryRequirements = (candidateSkills, jobRequirements) => {
 const getMatchesForCandidate = async (req, res) => {
     try {
         const candidateId = req.params.candidateId;
+        
+        // Get specific job ID from query if triggered by a single job update
+        const specificJobId = req.query.jobId; 
 
-        // Fetch Candidate Profile
-        const candidateSnap = await db.ref(`candidates/${candidateId}`).once('value');
-        if (!candidateSnap.exists()) {
+        // Fetch Candidate Profile from Firestore
+        const candidateDoc = await db.collection('candidates').doc(candidateId).get();
+        if (!candidateDoc.exists) {
             return res.status(404).json({ error: "Candidate not found." });
         }
         
-        const candidateData = candidateSnap.val();
-        const personalInfo = candidateData.personal_info || {};
-        const maxDist = personalInfo.max_distance || 15; // Defaults to 15km if not set
+        const candidateData = candidateDoc.data();
         
-        // Fetch All Available Jobs
-        const jobsSnap = await db.ref('jobs').once('value');
-        const allJobs = jobsSnap.val() || {};
+        // We will accumulate matches. If triggered for all jobs, we overwrite. 
+        // If triggered for a specific job, we will merge this new match with the existing jobMatches.
         let matchResults = [];
 
-        // Processing Loop
-        for (const rawJobId in allJobs) {
-            const jobData = normalizeJobData(allJobs[rawJobId], rawJobId);
-            const jobLoc = jobData.location;
+        // ==========================================
+        // THE FUNNEL: Fetching All Jobs to Prevent String Bugs
+        // ==========================================
+        
+        // Fetch all jobs from database to avoid strict string matching bugs
+        const jobsSnap = await db.collection('jobs').get();
+        
+        if (jobsSnap.empty) {
+            // Clean the array if no jobs exist in the system
+            await db.collection('candidates').doc(candidateId).update({ jobMatches: [] });
+            return res.status(200).json({
+                success: true,
+                message: "No jobs found in the system.",
+                total_matches: 0,
+                matches: [] 
+            });
+        }
 
-            console.log(`Checking job: ${jobData.basic_info.job_title} | ID: ${jobData.jobId}`);
+        // Processing Loop for the filtered jobs
+        for (const doc of jobsSnap.docs) {
+            const jobData = doc.data();
+            jobData.id = doc.id; 
 
-            // --- FILTER A: Geo-Distance ---
-            // simple english comment: Uses request coordinates or falls back to candidate profile coordinates
-            const candidateLat = req.body?.lat || personalInfo?.lat;
-            const candidateLng = req.body?.lng || personalInfo?.lng;
-            
-            if (candidateLat && candidateLng && jobLoc.lat && jobLoc.lng) { 
-                const distance = calculateDistance(candidateLat, candidateLng, jobLoc.lat, jobLoc.lng);
-                if (distance > maxDist) {
-                    console.log(`DEBUG: Job ${jobData.jobId} failed Distance (Distance: ${distance.toFixed(1)}km, Max: ${maxDist}km)`);
-                    continue; 
-                }
-                jobData.calculated_distance = Number(distance.toFixed(1));
-            } else {
-                jobData.calculated_distance = 0; // Fallback if no coordinates exist
-            }
-
-            // --- FILTER B: Strict Schedule ---
-            if (jobData.availability && candidateData.availability) {
-                const scheduleScore = calculateScheduleMatch(jobData.availability, candidateData.availability);
-                if (scheduleScore < 100) {
-                    console.log(`DEBUG: Job ${jobData.jobId} failed Schedule Match (Score: ${scheduleScore})`);
-                    continue; 
-                }
-            }
-
-            // --- FILTER C: Dealbreakers ---
-            if (failsDealbreakers(candidateData.preferences, jobData.characteristics)) {
-                console.log(`DEBUG: Job ${jobData.jobId} failed Dealbreakers`);
+            // Skip other jobs if we are only triggered to match a specific new job
+            if (specificJobId && jobData.id !== specificJobId) {
                 continue;
             }
 
-            // --- FILTER D: Mandatory Requirements (Certifications/Licenses) ---
-            if (failsMandatoryRequirements(candidateData.skills, jobData.requirements)) {
-                console.log(`DEBUG: Job ${jobData.jobId} failed Mandatory Requirements`);
+            // Prevent user from matching with their own job
+            if (jobData.employerId === candidateId) {
+                console.log(`DEBUG: Skipping job ${jobData.id} - User is the employer`);
+                continue;
+            }
+
+            // Calculate basic distance or use the exact one provided by the user/postman
+            const jobAddress = (jobData.address || "").trim().toLowerCase();
+            const candAddress = (candidateData.address || "").trim().toLowerCase();
+            const calculatedDistance = jobAddress === candAddress ? 4.0 : 35.0;
+            
+            // Use distance and radius from candidate data if they exist
+            const distanceToJob = candidateData.distance_to_job !== undefined ? Number(candidateData.distance_to_job) : calculatedDistance;
+            const searchRadius = candidateData.searchRadius !== undefined ? Number(candidateData.searchRadius) : 50.0;
+
+            console.log(`Checking job: ${jobData.title} | ID: ${jobData.id}`);
+
+            // --- FILTER A: Strict Schedule ---
+            const hasCandidateSchedule = candidateData.availableDays && Array.isArray(candidateData.availableDays) && candidateData.availableDays.length > 0;
+            
+            if (jobData.date && hasCandidateSchedule) {
+                const scheduleScore = calculateScheduleMatch(jobData.date, candidateData.availableDays);
+                if (scheduleScore < 100) {
+                    console.log(`DEBUG: Job ${jobData.id} failed Schedule Match`);
+                    continue; 
+                }
+            }
+
+            // --- FILTER B: License Dealbreaker ---
+            const combinedJobText = `${jobData.title} ${jobData.description} ${jobData.requirements}`.toLowerCase();
+            if (failsLicenseDealbreaker(candidateData.licenses, combinedJobText)) {
+                console.log(`DEBUG: Job ${jobData.id} failed License Dealbreaker`);
                 continue;
             }
 
             try {
-                // --- STEP E: AI Semantic Scoring ---
-                
+                // --- STEP C: AI Semantic Scoring & Payload Mapping ---
                 const aiJobPayload = {
+                    category: jobData.category,
                     description: jobData.description,
-                    apparel_requirements: jobData.apparel_requirements,
-                    requirements: jobData.requirements,
-                    basic_info: {
-                        location_city: jobData.basic_info.address.split(',').pop().trim(),
-                        job_title: jobData.basic_info.job_title
+                    requirements: {
+                        languages: [],
+                        tech_stack: [],
+                        tools: [],
+                        min_experience_years: 0,
+                        mandatory_skills: typeof jobData.requirements === 'string' ? [jobData.requirements] : jobData.requirements
                     },
-                    dealbreakers: jobData.dealbreakers
+                    basic_info: {
+                        location_city: jobData.address,
+                        job_title: jobData.title
+                    },
+                    dealbreakers: {
+                        requires_license: combinedJobText.includes("רישיון"),
+                        is_remote: false,
+                        is_student_only: combinedJobText.includes("סטודנט")
+                    }
                 };
 
-                // simple english comment: Send the dynamic semantic profile we generated earlier!
                 const candidateProfileForAi = {
+                    // pass 'id' so python logger stops saying 'unknown'
+                    id: candidateId, 
                     candidateId: candidateId,
-                    semantic_profile: candidateData.full_semantic_profile || candidateData.bio || "No detailed profile provided.",
+                    semantic_profile: candidateData.semantic_profile || candidateData.bio || candidateData.other || "",
+                    // pass the correct distance and search radius
+                    distance_to_job: distanceToJob,
+                    searchRadius: searchRadius,
+                    skills: {
+                        licenses: candidateData.licenses || [],
+                        languages: candidateData.languages || [],
+                        tech_stack: candidateData.software || [],
+                        tools: candidateData.certificates || []
+                    },
+                    personal_info: {
+                        full_name: candidateData.name || "",
+                        city: candidateData.address || "",
+                        is_student: (candidateData.bio || "").includes("סטודנט")
+                    },
+                    experience: [] 
                 };
 
-                // Send clean data to Python AI server
                 const aiResponse = await getAiSemanticScore(aiJobPayload, candidateProfileForAi);
                 
                 let rawAiScore = 0;
@@ -190,40 +157,77 @@ const getMatchesForCandidate = async (req, res) => {
                 if (aiResponse && typeof aiResponse === 'object') {
                     rawAiScore = aiResponse.Final_Score ?? aiResponse.score ?? 0;
                     aiExplanation = aiResponse.Reason || aiResponse.reason || aiExplanation;
-                    if (aiResponse.Status === "REJECTED") {
-                        isHardRejected = true;
+                    if (aiResponse.Status === "REJECTED" || aiResponse.Status === "NO MATCH") {
+                        // also handle NO MATCH from radius failure
+                        if (rawAiScore === 0) {
+                            isHardRejected = true;
+                        }
                     }
                 }
 
-                // --- STEP F: Final Decision Processing ---
+                // --- STEP D: Final Decision Processing ---
                 if (!isHardRejected) {
                     const finalResult = calculateFinalMatchScore(jobData, candidateData, rawAiScore);
 
                     if (finalResult.finalScore > 0) {
                         matchResults.push({
-                            jobId: jobData.jobId,
-                            job_title: jobData.basic_info.job_title,
-                            company_name: jobData.basic_info.company_name,
+                            jobId: jobData.id,
+                            job_title: jobData.title,
+                            company_name: jobData.company,
                             final_match_score: finalResult.finalScore,
                             match_explanation: aiExplanation, 
-                            distance_km: jobData.calculated_distance,
                             status: finalResult.status,
                             breakdown: finalResult.breakdown,
                             full_job_data: jobData 
                         });
                     }
+                } else {
+                    // log the rejection reason from python
+                    console.log(`DEBUG: Job ${jobData.id} was rejected by Python AI: ${aiExplanation}`);
                 }
             } catch (aiError) {
-                logger.error(`AI logic error for job ${jobData.jobId}: ${aiError.message}`);
+                logger.error(`AI logic error for job ${jobData.id}: ${aiError.message}`);
             }
         }
 
-        // Sort matches (Highest score first)
-        matchResults.sort((a, b) => b.final_match_score - a.final_match_score);
+        // ==========================================
+        // STEP E: Save matches to Candidate Profile
+        // ==========================================
+        
+        let newJobMatchesToSave = matchResults.map(match => ({
+            jobId: match.jobId,
+            score: match.final_match_score
+        }));
+
+        let finalMatchesToUpdate = [];
+
+        // If we only checked ONE job, we shouldn't delete the old matches. We must merge them.
+        if (specificJobId) {
+            let existingMatches = candidateData.jobMatches || [];
+            
+            // Remove the old score for this specific job if it existed
+            existingMatches = existingMatches.filter(m => m.jobId !== specificJobId);
+            
+            // Combine old matches with the newly calculated one
+            finalMatchesToUpdate = [...existingMatches, ...newJobMatchesToSave];
+        } else {
+            // If we checked ALL jobs (no specificJobId), overwrite everything
+            finalMatchesToUpdate = newJobMatchesToSave;
+        }
+
+        // Sort before saving (Highest score first)
+        finalMatchesToUpdate.sort((a, b) => b.score - a.score);
+
+        console.log(`Saving ${finalMatchesToUpdate.length} matches to candidate document...`);
+
+        // Direct document update
+        await db.collection('candidates').doc(candidateId).update({
+            jobMatches: finalMatchesToUpdate
+        });
 
         res.status(200).json({
             success: true,
-            total_matches: matchResults.length,
+            total_matches: finalMatchesToUpdate.length,
             matches: matchResults 
         });
 

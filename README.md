@@ -67,12 +67,10 @@ To ensure high accuracy in predicting job matches, the models underwent a rigoro
 
 ## Tech Stack
 
-| Layer | Tools |
-|---|---|
-| **Backend** | Node.js with Express |
-| **AI Service** | Python with Flask, Scikit-learn, and NLP models (RoBERTa, SVM, MLP) |
-| **Database & Auth** | Firebase Admin SDK working against Firestore |
-| **Cloud & Runtime** | Docker and Google Cloud Run |
+- **Backend:** Node.js with Express
+- **AI Service:** Python with Flask, Scikit-learn, and NLP models (RoBERTa, SVM, MLP)
+- **Database & Auth:** Firebase Admin SDK working against Firestore
+- **Cloud & Runtime:** Docker and Google Cloud Run
 
 ---
 
@@ -104,7 +102,7 @@ npm install
 
 # Create a .env file with the port, the AI server URL, and Firebase credentials
 echo "PORT=8080" > .env
- 
+
 # Start the server
 npm start
 ```
@@ -122,6 +120,7 @@ A quick map of where the core logic lives:
 - **`src/utils/scheduleMatcher.js`** — Implements the hard-constraint scheduling logic, used to immediately rule out candidates whose availability doesn't fit a job before they're sent to the AI for scoring.
 - **`src/controllers/matchController.js`** — Orchestrates the matching flow: fetches candidates and jobs, applies the hard-constraint filters, calls the AI Engine, and saves the ranked matches back to Firestore.
 - **`src/services/aiService.js`** — Handles the outbound request to the Python AI Engine and normalizes its response for the rest of the backend.
+- **`src/controllers/candidateController.js`** — Handles candidate profile creation/updates, including PDF résumé parsing (via `pdf-parse`) before the extracted text is sent onward for AI scoring. A dedicated `/api/extract-cv` route in `server.js` also exposes this extraction on its own.
 - **`package.json`** — Project configuration, dependencies, and the start script (`npm start`).
 
 **Python AI Engine**
@@ -142,3 +141,4 @@ A quick map of where the core logic lives:
 
 - Gal Deri
 - Netanel Michel
+

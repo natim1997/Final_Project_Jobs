@@ -104,7 +104,7 @@ npm install
 
 # Create a .env file with the port, the AI server URL, and Firebase credentials
 echo "PORT=8080" > .env
-
+ 
 # Start the server
 npm start
 ```

@@ -506,3 +506,122 @@
 {"level":"info","message":"[MATCH] Triggering match engine for candidate: test-candidate-schedule","timestamp":"2026-07-26 20:12:04"}
 {"level":"info","message":"[MATCH] Finished matching for candidate: test-candidate-schedule","timestamp":"2026-07-26 20:12:09"}
 {"level":"info","message":"127.0.0.1 - - [26/Jul/2026:17:12:09 +0000] \"POST /api/candidates HTTP/1.1\" 200 108 \"-\" \"PostmanRuntime/7.54.0\"","timestamp":"2026-07-26 20:12:09"}
+{"level":"info","message":"Node.js Server started on port 8080","timestamp":"2026-07-27 19:06:07"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: 7CdzZsQypQTSS6G6euBW","timestamp":"2026-07-27 19:08:18"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: 7CdzZsQypQTSS6G6euBW","timestamp":"2026-07-27 19:08:37"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:08:37 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:08:37"}
+{"level":"info","message":"Node.js Server started on port 8080","timestamp":"2026-07-27 19:23:26"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: pDM7Gk0wbYIMHuqiQJGR","timestamp":"2026-07-27 19:23:39"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: pDM7Gk0wbYIMHuqiQJGR","timestamp":"2026-07-27 19:24:22"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:24:22 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:24:22"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: mkPlypACKPAKvU9PDXwp","timestamp":"2026-07-27 19:27:47"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: mkPlypACKPAKvU9PDXwp","timestamp":"2026-07-27 19:27:56"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:27:56 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:27:56"}
+{"level":"info","message":"Node.js Server started on port 8080","timestamp":"2026-07-27 19:49:29"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: yEXtSalAOGtP8wcOoxN9","timestamp":"2026-07-27 19:49:42"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: yEXtSalAOGtP8wcOoxN9","timestamp":"2026-07-27 19:49:49"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:49:49 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:49:49"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: zva3TCpIvaRz1dmrjfID","timestamp":"2026-07-27 19:53:13"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: zva3TCpIvaRz1dmrjfID","timestamp":"2026-07-27 19:53:21"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:53:21 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:53:21"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: esfMIodzPXcjKrnOgSBY","timestamp":"2026-07-27 19:54:05"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: esfMIodzPXcjKrnOgSBY","timestamp":"2026-07-27 19:54:11"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:54:11 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:54:11"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: 4eDWPQwNEb0LmjA0slX5","timestamp":"2026-07-27 19:54:44"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: 4eDWPQwNEb0LmjA0slX5","timestamp":"2026-07-27 19:54:50"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:54:50 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:54:50"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: mqOLXZFnJAJmfkbvo7gI","timestamp":"2026-07-27 19:55:02"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: mqOLXZFnJAJmfkbvo7gI","timestamp":"2026-07-27 19:55:08"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:16:55:08 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 19:55:08"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: YoDmFj862K6cLDZ4zufx","timestamp":"2026-07-27 20:00:49"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: YoDmFj862K6cLDZ4zufx","timestamp":"2026-07-27 20:00:56"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:17:00:56 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 20:00:56"}
+{"level":"info","message":"Node.js Server started on port 8080","timestamp":"2026-07-27 20:03:09"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: dp4IScz3kXBcpilp7dta","timestamp":"2026-07-27 20:03:32"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: dp4IScz3kXBcpilp7dta","timestamp":"2026-07-27 20:03:41"}
+{"level":"info","message":"127.0.0.1 - - [27/Jul/2026:17:03:41 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-27 20:03:41"}
+{"level":"info","message":"Node.js Server started on port 8080","timestamp":"2026-07-28 08:05:17"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: 1zcmvZzCdWBFm2rspyD8","timestamp":"2026-07-28 08:06:27"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: 1zcmvZzCdWBFm2rspyD8","timestamp":"2026-07-28 08:06:37"}
+{"level":"info","message":"127.0.0.1 - - [28/Jul/2026:05:06:37 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-28 08:06:37"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: 45OE6Ew1cSfmr2gJFZVu","timestamp":"2026-07-28 08:07:01"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: 45OE6Ew1cSfmr2gJFZVu","timestamp":"2026-07-28 08:07:07"}
+{"level":"info","message":"127.0.0.1 - - [28/Jul/2026:05:07:07 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-28 08:07:07"}
+{"level":"info","message":"Node.js Server started on port 8080","timestamp":"2026-07-30 09:12:44"}
+{"level":"warn","message":"Python AI not reachable, using fallback text generation","timestamp":"2026-07-30 09:14:10"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: pT6aoJVDbzzJOOyFKT61","timestamp":"2026-07-30 09:14:10"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: pT6aoJVDbzzJOOyFKT61","timestamp":"2026-07-30 09:14:10"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:14:10 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:14:10"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:15:08 +0000] \"POST /api/jobs HTTP/1.1\" 400 65 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:15:08"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:16:06 +0000] \"POST /api/jobs HTTP/1.1\" 400 65 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:16:06"}
+{"level":"info","message":"[MATCH] Job u184g3LFEwYxnDa7FCl3 changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:17:55"}
+{"level":"info","message":"Job Created: ID u184g3LFEwYxnDa7FCl3 with category חיות מחמד","timestamp":"2026-07-30 09:17:55"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:17:55 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:17:55"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job u184g3LFEwYxnDa7FCl3","timestamp":"2026-07-30 09:17:56"}
+{"level":"warn","message":"Python AI not reachable, using fallback text generation","timestamp":"2026-07-30 09:19:12"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: tvo6kpqNbYERHVYapNEI","timestamp":"2026-07-30 09:19:12"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: tvo6kpqNbYERHVYapNEI","timestamp":"2026-07-30 09:19:13"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:19:13 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:19:13"}
+{"level":"info","message":"[MATCH] Job IHUioJiWfce629Y3ZEux changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:23:31"}
+{"level":"info","message":"Job Created: ID IHUioJiWfce629Y3ZEux with category חיות מחמד","timestamp":"2026-07-30 09:23:31"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:23:31 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:23:31"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job IHUioJiWfce629Y3ZEux","timestamp":"2026-07-30 09:23:32"}
+{"level":"warn","message":"Python AI not reachable, using fallback text generation","timestamp":"2026-07-30 09:26:56"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: kwJFTs634mHTwYr2yW6Y","timestamp":"2026-07-30 09:26:56"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: kwJFTs634mHTwYr2yW6Y","timestamp":"2026-07-30 09:26:56"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:26:56 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:26:56"}
+{"level":"warn","message":"Python AI not reachable, using fallback text generation","timestamp":"2026-07-30 09:27:32"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: aUFiT31CuS8oTcSL9dYy","timestamp":"2026-07-30 09:27:32"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: aUFiT31CuS8oTcSL9dYy","timestamp":"2026-07-30 09:27:32"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:27:32 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:27:32"}
+{"level":"info","message":"[MATCH] Job JhpajXutyRERlyJ5vCej changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:29:31"}
+{"level":"info","message":"Job Created: ID JhpajXutyRERlyJ5vCej with category חיות מחמד","timestamp":"2026-07-30 09:29:31"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:29:31 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:29:31"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job JhpajXutyRERlyJ5vCej","timestamp":"2026-07-30 09:29:31"}
+{"level":"warn","message":"Python AI not reachable, using fallback text generation","timestamp":"2026-07-30 09:33:15"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: kEXyC79JXqsmcKFE8p8z","timestamp":"2026-07-30 09:33:16"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: kEXyC79JXqsmcKFE8p8z","timestamp":"2026-07-30 09:33:16"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:33:16 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:33:16"}
+{"level":"warn","message":"Python AI not reachable, using fallback text generation","timestamp":"2026-07-30 09:34:34"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: eCV1kcgRawBvr5nAWw6G","timestamp":"2026-07-30 09:34:34"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: eCV1kcgRawBvr5nAWw6G","timestamp":"2026-07-30 09:34:34"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:34:34 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:34:34"}
+{"level":"info","message":"[MATCH] Job PLW5kbG0AVdMSxl7oWrY changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:35:28"}
+{"level":"info","message":"Job Created: ID PLW5kbG0AVdMSxl7oWrY with category חיות מחמד","timestamp":"2026-07-30 09:35:28"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:35:29 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:35:29"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job PLW5kbG0AVdMSxl7oWrY","timestamp":"2026-07-30 09:35:29"}
+{"level":"info","message":"[MATCH] Job i0cD8H5H2vmEp3D3AWcx changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:40:16"}
+{"level":"info","message":"Job Created: ID i0cD8H5H2vmEp3D3AWcx with category חיות מחמד","timestamp":"2026-07-30 09:40:16"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:40:16 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:40:16"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job i0cD8H5H2vmEp3D3AWcx","timestamp":"2026-07-30 09:40:17"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: YHfaOuk278Bnnc9velr9","timestamp":"2026-07-30 09:43:20"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: YHfaOuk278Bnnc9velr9","timestamp":"2026-07-30 09:43:20"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:43:20 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:43:20"}
+{"level":"info","message":"[MATCH] Job FdAi5FaH3ViD4WpkwuQg changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:43:45"}
+{"level":"info","message":"Job Created: ID FdAi5FaH3ViD4WpkwuQg with category חיות מחמד","timestamp":"2026-07-30 09:43:45"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:43:45 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:43:45"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job FdAi5FaH3ViD4WpkwuQg","timestamp":"2026-07-30 09:43:46"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: xunikPDaU28CgfGX1ibs","timestamp":"2026-07-30 09:44:05"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: xunikPDaU28CgfGX1ibs","timestamp":"2026-07-30 09:44:05"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:44:05 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:44:05"}
+{"level":"info","message":"[MATCH] Job nZBc30Hbun3d0nhThNx6 changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:44:24"}
+{"level":"info","message":"Job Created: ID nZBc30Hbun3d0nhThNx6 with category חיות מחמד","timestamp":"2026-07-30 09:44:24"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:44:24 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:44:24"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job nZBc30Hbun3d0nhThNx6","timestamp":"2026-07-30 09:44:24"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: Zx81PmDgsjrI1ftxfNbh","timestamp":"2026-07-30 09:45:10"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: Zx81PmDgsjrI1ftxfNbh","timestamp":"2026-07-30 09:45:10"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:45:10 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:45:10"}
+{"level":"info","message":"[MATCH] Job bxTYIeNkiZoLVGLcfnh2 changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:45:25"}
+{"level":"info","message":"Job Created: ID bxTYIeNkiZoLVGLcfnh2 with category חיות מחמד","timestamp":"2026-07-30 09:45:25"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:45:25 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:45:25"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job bxTYIeNkiZoLVGLcfnh2","timestamp":"2026-07-30 09:45:26"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: RLXSuZe9jocdKnFGy7RQ","timestamp":"2026-07-30 09:45:57"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: RLXSuZe9jocdKnFGy7RQ","timestamp":"2026-07-30 09:45:58"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:45:58 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:45:58"}
+{"level":"info","message":"[MATCH] Job I5FAWTRiTa1CUhmY9UAv changed! Checking matches for this specific job...","timestamp":"2026-07-30 09:46:16"}
+{"level":"info","message":"Job Created: ID I5FAWTRiTa1CUhmY9UAv with category חיות מחמד","timestamp":"2026-07-30 09:46:16"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:46:16 +0000] \"POST /api/jobs HTTP/1.1\" 201 70 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:46:16"}
+{"level":"info","message":"[MATCH] Finished matching all candidates for job I5FAWTRiTa1CUhmY9UAv","timestamp":"2026-07-30 09:46:16"}
+{"level":"info","message":"[MATCH] Triggering match engine for candidate: 4GCPaauGjIVZOsg7EejZ","timestamp":"2026-07-30 09:49:57"}
+{"level":"info","message":"[MATCH] Finished matching for candidate: 4GCPaauGjIVZOsg7EejZ","timestamp":"2026-07-30 09:49:58"}
+{"level":"info","message":"127.0.0.1 - - [30/Jul/2026:06:49:58 +0000] \"POST /api/candidates HTTP/1.1\" 200 105 \"-\" \"PostmanRuntime/7.55.1\"","timestamp":"2026-07-30 09:49:58"}

@@ -38,7 +38,7 @@ def safe_list(val):
 
 class JobMatcherPipeline:
     def __init__(self):
-        print("★★★ CLICKJOB AI PIPELINE (VERSION 8.2 - STRICT RANGES & BOOSTS) ★★★")
+        print("★★★ CLICKJOB AI PIPELINE (VERSION 8.3 - FIXED CASUAL SCORING) ★★★")
         print("Initializing Models...")
         
         try:
@@ -119,9 +119,10 @@ class JobMatcherPipeline:
             # ==========================================
             # STAGE 3: Base Scoring (MLP)
             # ==========================================
+            # FIXED: Sending only the 2 parameters the MLP was trained for!
             mlp_input = pd.DataFrame(
-                [[semantic_similarity, svm_confidence, distance_km, experience_months]],
-                columns=['Semantic_Similarity', 'SVM_Confidence', 'Distance_km', 'Experience_Months']
+                [[semantic_similarity, svm_confidence]],
+                columns=['Semantic_Similarity', 'SVM_Confidence']
             )
             raw_final_score = float(self.mlp.predict(mlp_input)[0])
 
@@ -143,22 +144,19 @@ class JobMatcherPipeline:
 
             is_simple_job = any(cat in job_category for cat in simple_categories)
 
-            # Scale semantic similarity for short bios
-            # A short bio yields low similarity (e.g., 0.15). Multiplying by 200 maps it to a 0-80 scale.
-            base_semantic_score = semantic_similarity * 200.0
-            
-            # Combine with MLP score
-            final_ai_score = base_semantic_score + (raw_final_score * 0.2)
+            # FIXED: We completely trust the new MLP score. No more dividing it by 5 (0.2).
+            final_ai_score = raw_final_score
 
             # ==========================================
             # BUSINESS & UX LOGIC: TARGET RANGES
             # ==========================================
             
-            # Motivation Boost for Simple Jobs
+            # Motivation Boost for Simple Jobs (Safety Net)
             if is_simple_job and category_match:
-                # Force into the 80 - 88 range
-                final_ai_score = 80.0 + (semantic_similarity * 25.0)
-                final_ai_score = min(88.0, max(80.0, final_ai_score))
+                # If it's a simple job and categories match, ensure it never drops below 80
+                final_ai_score = max(80.0, final_ai_score)
+                # Apply a slight organic boost based on semantic similarity
+                final_ai_score += (semantic_similarity * 10.0)
                 
             elif is_simple_job and semantic_similarity > 0.05:
                 # If they didn't check the category box but the bio matches slightly, give a baseline boost

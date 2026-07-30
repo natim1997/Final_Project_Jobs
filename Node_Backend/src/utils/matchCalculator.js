@@ -8,7 +8,7 @@ const cityCoordinates = require('./israelCities.js');
 // Helper function to extract city name from a full address string
 const extractCityFromAddress = (addressString) => {
     if (!addressString) return "";
-    
+
     // Loop through all the cities in our dictionary
     for (const city of Object.keys(cityCoordinates)) {
         // Check if the city name is inside the address string
@@ -24,97 +24,113 @@ const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the earth in km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = 
+    const a =
         Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c; // Distance in km
 };
 
+// ==========================================
+// Shared city-based distance estimator
+// ==========================================
+// Single source of truth for "how far apart are this candidate and this job",
+// used both by the location gate below AND by matchController.js/
+// jobController.js to build the `distance_to_job` value sent to the Python AI
+// engine. Previously those two call sites used a completely different (and
+// far cruder) estimate - an exact string comparison of the raw address
+// fields that almost never matched even for two locations in the same city -
+// which caused the AI's own radius pre-filter to reject almost everything
+// before it even got a chance to score.
+//
+// Returns a number (km) when it can be determined, or null when the cities
+// are unknown/unmatched (caller decides how to treat "unknown").
+const estimateDistanceKm = (job, candidate) => {
+    const candData = candidate.candidate ? candidate.candidate : candidate;
+
+    const candidateCity = (candData.city || extractCityFromAddress(candData.address) || "").trim();
+    const jobCity = (job.city || job.location || extractCityFromAddress(job.address) || "").trim();
+
+    if (!candidateCity || !jobCity) {
+        return { distanceKm: null, candidateCity, jobCity, reason: "MISSING_CITY" };
+    }
+
+    const candCoords = cityCoordinates[candidateCity];
+    const jobCoords = cityCoordinates[jobCity];
+
+    if (candCoords && jobCoords) {
+        const distanceKm = getDistanceFromLatLonInKm(candCoords.lat, candCoords.lng, jobCoords.lat, jobCoords.lng);
+        return { distanceKm, candidateCity, jobCity, reason: "COORDINATES" };
+    }
+
+    if (candidateCity === jobCity) {
+        return { distanceKm: 0, candidateCity, jobCity, reason: "EXACT_TEXT_MATCH" };
+    }
+
+    return { distanceKm: null, candidateCity, jobCity, reason: "NO_COORDINATES_NO_MATCH" };
+};
+
 const calculateFinalMatchScore = (job, candidate, rawAiScore) => {
-    
+
     // 1. Unwrap the candidate object if it's nested (Postman JSON structure fix)
     const candData = candidate.candidate ? candidate.candidate : candidate;
-    
+
     // Ensure AI score is a valid number
     let baseScore = parseFloat(rawAiScore);
     if (isNaN(baseScore)) {
         baseScore = 0;
     }
 
-    // 2. Read from the unwrapped object (candData)
-    const candidateCity = (candData.city || extractCityFromAddress(candData.address) || "").trim();
-    const jobCity = (job.city || job.location || extractCityFromAddress(job.address) || "").trim();
-    
     // Default user radius to 20 if not specified
-    const userRadius = candData.searchRadius || 20; 
-    
+    const userRadius = candData.searchRadius || 20;
+
     let finalScore = baseScore;
-    let locationReason = "Location match";
     let status = "NO MATCH";
 
     // ==========================================
-    // STRICT LOCATION GATEKEEPERS
+    // STRICT LOCATION GATEKEEPER
     // ==========================================
 
-    // GATE 1: Missing city info entirely
-    if (!candidateCity || !jobCity) {
+    const { distanceKm, candidateCity, jobCity } = estimateDistanceKm(job, candidate);
+
+    if (distanceKm === null) {
         return {
             finalScore: 0,
             status: "NO MATCH",
             breakdown: {
                 aiBaseScore: Math.round(baseScore),
                 locationPenalty: "BLOCKED",
-                info: `Blocked: Missing city info (Candidate: '${candidateCity}', Job: '${jobCity}')`
+                info: !candidateCity || !jobCity
+                    ? `Blocked: Missing city info (Candidate: '${candidateCity}', Job: '${jobCity}')`
+                    : `Blocked: Cities do not match (${candidateCity} vs ${jobCity}) and no map data found.`
             }
         };
     }
 
-    const candCoords = cityCoordinates[candidateCity];
-    const jobCoords = cityCoordinates[jobCity];
-
-    // GATE 2: Exact coordinate math
-    if (candCoords && jobCoords) {
-        const distanceKm = getDistanceFromLatLonInKm(candCoords.lat, candCoords.lng, jobCoords.lat, jobCoords.lng);
-        
-        if (distanceKm > userRadius) {
-            return {
-                finalScore: 0,
-                status: "NO MATCH",
-                breakdown: {
-                    aiBaseScore: Math.round(baseScore),
-                    locationPenalty: "BLOCKED",
-                    info: `Blocked: Job is ${Math.round(distanceKm)}km away (exceeds ${userRadius}km limit)`
-                }
-            };
-        }
-        locationReason = `Distance: ${Math.round(distanceKm)}km (Within ${userRadius}km radius)`;
-    } 
-    // GATE 3: No coordinates found for one/both, and the text names do not match exactly
-    else if (candidateCity !== jobCity) {
+    if (distanceKm > userRadius) {
         return {
             finalScore: 0,
             status: "NO MATCH",
             breakdown: {
                 aiBaseScore: Math.round(baseScore),
                 locationPenalty: "BLOCKED",
-                info: `Blocked: Cities do not match (${candidateCity} vs ${jobCity}) and no map data found.`
+                info: `Blocked: Job is ${Math.round(distanceKm)}km away (exceeds ${userRadius}km limit)`
             }
         };
     }
-    // If it reaches here without coordinates, it means candidateCity === jobCity exactly.
-    else {
-        locationReason = `Exact text match (${candidateCity}), assuming 0km distance.`;
-    }
+
+    const locationReason = `Distance: ${Math.round(distanceKm)}km (Within ${userRadius}km radius)`;
 
     // ==========================================
     // FINAL SCORING
     // ==========================================
 
-    if (finalScore >= 75) {
+    // Thresholds aligned with the AI engine's score ranges (final_pipeline.py):
+    // 0 = disqualified, 1-59 = poor match, 60+ = good potential and above.
+    if (finalScore >= 60) {
         status = "MATCH";
-    } else if (finalScore >= 40) {
+    } else if (finalScore >= 1) {
         status = "POTENTIAL";
     }
 
@@ -129,4 +145,4 @@ const calculateFinalMatchScore = (job, candidate, rawAiScore) => {
     };
 };
 
-module.exports = { calculateFinalMatchScore };
+module.exports = { calculateFinalMatchScore, estimateDistanceKm };

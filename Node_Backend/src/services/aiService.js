@@ -2,11 +2,11 @@ const axios = require('axios');
 
 const getAiSemanticScore = async (job, candidate) => {
     try {
-        // simple english comment: LOCAL TESTING URL - Using local server for testing the new AI model
-        const pythonServerUrl = "http://127.0.0.1:5000/api/match";
-
-        // simple english comment: CLOUD URL - Commented out for local testing
-        // const pythonServerUrl = "https://clickjob-ai-engine-493713788422.europe-west1.run.app/api/match";
+        // AI_SERVER_URL comes from the environment (set in .env locally, or as
+        // a Cloud Run env var in production) - falls back to localhost only
+        // for convenience when no env var is set.
+        const aiServerBase = process.env.AI_SERVER_URL || "http://127.0.0.1:5000";
+        const pythonServerUrl = `${aiServerBase}/api/match`;
 
         // simple english comment: Extract the bio text safely no matter how it is named in Firebase
         const candidateText = candidate.bio || candidate.description || "";

@@ -35,11 +35,11 @@ const createCandidate = async (req, res) => {
         // 6. Request AI Bio Generation from Python
         let semanticProfile = existingData.semantic_profile || "";
         try {
-            // Forcing local server instead of process.env.AI_SERVER_URL
-            const localAiUrl = "http://127.0.0.1:5000/api/generate-bio";
-            console.log("DEBUG: Generating bio via local AI at:", localAiUrl);
-            
-            const aiResponse = await axios.post(localAiUrl, {
+            const aiServerBase = process.env.AI_SERVER_URL || "http://127.0.0.1:5000";
+            const generateBioUrl = `${aiServerBase}/api/generate-bio`;
+            console.log("DEBUG: Generating bio via AI at:", generateBioUrl);
+
+            const aiResponse = await axios.post(generateBioUrl, {
                 ...data,
                 extracted_cv_text: cvText
             });

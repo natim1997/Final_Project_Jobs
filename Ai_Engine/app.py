@@ -25,13 +25,19 @@ except Exception as e:
 # ==========================================
 
 def compose_candidate_bio(data):
-    # This function takes dry tags and the 'other' field 
+    # This function takes dry tags and the 'other' field
     # and turns them into a human-like professional paragraph for the AI to read.
     name = data.get('name', 'המועמד')
     categories = ", ".join(data.get('jobCatagories', []))
     languages = ", ".join(data.get('languages', []))
     licenses = ", ".join(data.get('licenses', []))
-    skills = ", ".join(data.get('softSkills', []))
+    # The real candidate form sends a single free-text "skills" string (e.g.
+    # "שירות לקוחות, סבלנות, עבודה עם קופה"), not a "softSkills" array - the
+    # array form is kept as a fallback in case some other client ever sends
+    # it that way. Without this, the entire skills field was silently
+    # dropped from the generated bio.
+    raw_skills = data.get('skills', data.get('softSkills', ''))
+    skills = ", ".join(raw_skills) if isinstance(raw_skills, list) else str(raw_skills or "")
     software = ", ".join(data.get('software', []))
     other_info = data.get('other', '')
     cv_text = data.get('extracted_cv_text', '')

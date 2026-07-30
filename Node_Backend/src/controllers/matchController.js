@@ -1,8 +1,9 @@
 const { db } = require('../config/firebase');
 const { getAiSemanticScore } = require('../services/aiService');
-const { calculateFinalMatchScore } = require('../utils/matchCalculator');
+const { calculateFinalMatchScore, estimateDistanceKm } = require('../utils/matchCalculator');
 const { calculateScheduleMatch } = require('../utils/scheduleMatcher');
 const logger = require('../config/logger');
+
 
 // ==========================================
 // Matchmaking Helper Functions (Adapted for Flat Schema)
@@ -74,15 +75,16 @@ const getMatchesForCandidate = async (req, res) => {
                 continue;
             }
 
-            // Calculate basic distance or use the exact one provided by the user/postman
-            const jobAddress = (jobData.address || "").trim().toLowerCase();
-            const candAddress = (candidateData.address || "").trim().toLowerCase();
-            const calculatedDistance = jobAddress === candAddress ? 4.0 : 35.0;
-            
-            // Use distance and radius from candidate data if they exist
-            const distanceToJob = candidateData.distance_to_job !== undefined ? Number(candidateData.distance_to_job) : calculatedDistance;
+            // Real city-based distance (haversine over israelCities.js coordinates) -
+            // same estimator matchCalculator.js uses for its own location gate later,
+            // so the AI's pre-filter and the final gate agree with each other. Only
+            // an explicit candidate-supplied distance_to_job overrides it.
+            const { distanceKm: estimatedDistance } = estimateDistanceKm(jobData, candidateData);
+            const distanceToJob = candidateData.distance_to_job !== undefined
+                ? Number(candidateData.distance_to_job)
+                : (estimatedDistance !== null ? estimatedDistance : 0);
             const searchRadius = candidateData.searchRadius !== undefined ? Number(candidateData.searchRadius) : 50.0;
-
+            
             console.log(`Checking job: ${jobData.title} | ID: ${jobData.id}`);
 
             // --- FILTER A: Strict Schedule ---
@@ -108,6 +110,11 @@ const getMatchesForCandidate = async (req, res) => {
                 const aiJobPayload = {
                     category: jobData.category,
                     description: jobData.description,
+                    // Real, dedicated "must-have" tags (short atomic strings), distinct
+                    // from the free-text requirements paragraph below. Doesn't exist in
+                    // the job creation form yet, so this is normally undefined/empty -
+                    // the Python gatekeeper treats an empty list as "not applicable".
+                    criticalRequirements: jobData.criticalRequirements || [],
                     requirements: {
                         languages: [],
                         tech_stack: [],
@@ -126,14 +133,29 @@ const getMatchesForCandidate = async (req, res) => {
                     }
                 };
 
+                // The real candidate profile only has a single free-text "skills"
+                // string (e.g. "שירות לקוחות, סבלנות, עבודה עם קופה"), not the
+                // richer softSkills/jobCatagories arrays this payload used to
+                // assume - those were always empty in production, silently
+                // killing Model 3's soft-skill signal. Split the string into a
+                // pseudo-array so the AI engine still gets real signal from it.
+                const candidateSkillsList = typeof candidateData.skills === 'string'
+                    ? candidateData.skills.split(',').map(s => s.trim()).filter(Boolean)
+                    : (candidateData.softSkills || []);
+
                 const candidateProfileForAi = {
                     // pass 'id' so python logger stops saying 'unknown'
-                    id: candidateId, 
+                    id: candidateId,
                     candidateId: candidateId,
                     semantic_profile: candidateData.semantic_profile || candidateData.bio || candidateData.other || "",
                     // pass the correct distance and search radius
                     distance_to_job: distanceToJob,
                     searchRadius: searchRadius,
+                    // jobCatagories stays [] in practice - there is no "preferred
+                    // category" field on the candidate profile today, so the
+                    // category-match bonus (Model 3's 80+/90+ tier) can't fire yet.
+                    jobCatagories: candidateData.jobCatagories || [],
+                    softSkills: candidateSkillsList,
                     skills: {
                         licenses: candidateData.licenses || [],
                         languages: candidateData.languages || [],
@@ -142,10 +164,9 @@ const getMatchesForCandidate = async (req, res) => {
                     },
                     personal_info: {
                         full_name: candidateData.name || "",
-                        city: candidateData.address || "",
+                        city: candidateData.city || candidateData.address || "",
                         is_student: (candidateData.bio || "").includes("סטודנט")
-                    },
-                    experience: [] 
+                    }
                 };
 
                 const aiResponse = await getAiSemanticScore(aiJobPayload, candidateProfileForAi);

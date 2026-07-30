@@ -2,6 +2,11 @@ venv/
 *.safetensors
 *.dll
 
-serviceAccountKey.jsonFinal_Project_V2/results/
+serviceAccountKey.json
+Final_Project_V2/results/
 *.pt
 *.safetensors
+
+__pycache__/
+*.pyc
+Node_Backend/logs/

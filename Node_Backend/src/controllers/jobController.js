@@ -1,6 +1,7 @@
 const { db } = require('../config/firebase');
-const logger = require('../config/logger'); 
-const { calculateFinalMatchScore } = require('../utils/matchCalculator'); 
+const logger = require('../config/logger');
+const { calculateFinalMatchScore, estimateDistanceKm } = require('../utils/matchCalculator');
+const { getAiSemanticScore } = require('../services/aiService');
 const { triggerAllCandidatesMatch } = require('../services/backgroundMatcher');
 
 // ==========================================
@@ -121,44 +122,122 @@ const deleteJob = async (req, res) => {
 const getJobCandidates = async (req, res) => {
     try {
         const { jobId } = req.params;
-        
+
         const jobDoc = await db.collection('jobs').doc(jobId).get();
         if (!jobDoc.exists) {
             return res.status(404).json({ error: "Job not found." });
         }
         const job = jobDoc.data();
+        job.id = jobId;
 
         const candidatesSnapshot = await db.collection('candidates').get();
         if (candidatesSnapshot.empty) {
             return res.status(200).json({ success: true, total_matches: 0, matches: [] });
         }
 
+        // Built once per job - identical shape to the payload matchController.js
+        // sends, so the AI engine sees the same job on both routes.
+        const combinedJobText = `${job.title} ${job.description} ${job.requirements}`.toLowerCase();
+        const aiJobPayload = {
+            category: job.category,
+            description: job.description,
+            criticalRequirements: job.criticalRequirements || [],
+            requirements: {
+                languages: [],
+                tech_stack: [],
+                tools: [],
+                min_experience_years: 0,
+                mandatory_skills: typeof job.requirements === 'string' ? [job.requirements] : job.requirements
+            },
+            basic_info: {
+                location_city: job.address,
+                job_title: job.title
+            },
+            dealbreakers: {
+                requires_license: combinedJobText.includes("רישיון"),
+                is_remote: false,
+                is_student_only: combinedJobText.includes("סטודנט")
+            }
+        };
+
         const matchedCandidates = [];
 
-        candidatesSnapshot.forEach(doc => {
+        // Sequential (not Promise.all) on purpose: this hits the Python AI
+        // server once per candidate, so we avoid hammering it with a burst of
+        // concurrent requests for jobs with many registered candidates.
+        for (const doc of candidatesSnapshot.docs) {
             const candidate = doc.data();
-            
+            candidate.id = candidate.id || doc.id;
+
             // Skip this candidate if they are the employer who posted the job!
             if (candidate.id === job.employerId) {
-                return; 
+                continue;
             }
 
-            const aiSemanticScore = 80; 
-            const matchResult = calculateFinalMatchScore(job, candidate, aiSemanticScore);
+            // Real city-based distance - see estimateDistanceKm in matchCalculator.js.
+            const { distanceKm: estimatedDistance } = estimateDistanceKm(job, candidate);
+            const distanceToJob = candidate.distance_to_job !== undefined
+                ? Number(candidate.distance_to_job)
+                : (estimatedDistance !== null ? estimatedDistance : 0);
+            const searchRadius = candidate.searchRadius !== undefined ? Number(candidate.searchRadius) : 50.0;
 
-            if (matchResult.status === "MATCH" || matchResult.status === "POTENTIAL") {
-                matchedCandidates.push({
-                    candidateId: candidate.id,
-                    name: candidate.name || "Unknown Candidate",
-                    phone: candidate.phone || "No phone",
-                    email: candidate.email || "No email",
-                    bio: candidate.bio || "",
-                    final_match_score: matchResult.finalScore,
-                    status: matchResult.status,
-                    breakdown: matchResult.breakdown
-                });
+            // See matchController.js for why this splits the free-text "skills"
+            // string instead of reading a (nonexistent) softSkills array.
+            const candidateSkillsList = typeof candidate.skills === 'string'
+                ? candidate.skills.split(',').map(s => s.trim()).filter(Boolean)
+                : (candidate.softSkills || []);
+
+            const candidateProfileForAi = {
+                id: candidate.id,
+                candidateId: candidate.id,
+                semantic_profile: candidate.semantic_profile || candidate.bio || candidate.other || "",
+                distance_to_job: distanceToJob,
+                searchRadius: searchRadius,
+                jobCatagories: candidate.jobCatagories || [],
+                softSkills: candidateSkillsList,
+                skills: {
+                    licenses: candidate.licenses || [],
+                    languages: candidate.languages || [],
+                    tech_stack: candidate.software || [],
+                    tools: candidate.certificates || []
+                },
+                personal_info: {
+                    full_name: candidate.name || "",
+                    city: candidate.city || candidate.address || "",
+                    is_student: (candidate.bio || "").includes("סטודנט")
+                }
+            };
+
+            try {
+                const aiResponse = await getAiSemanticScore(aiJobPayload, candidateProfileForAi);
+
+                let rawAiScore = 0;
+                if (aiResponse && typeof aiResponse === 'object') {
+                    rawAiScore = aiResponse.Final_Score ?? aiResponse.score ?? 0;
+                    const isHardRejected = (aiResponse.Status === "REJECTED" || aiResponse.Status === "NO MATCH") && rawAiScore === 0;
+                    if (isHardRejected) {
+                        continue;
+                    }
+                }
+
+                const matchResult = calculateFinalMatchScore(job, candidate, rawAiScore);
+
+                if (matchResult.status === "MATCH" || matchResult.status === "POTENTIAL") {
+                    matchedCandidates.push({
+                        candidateId: candidate.id,
+                        name: candidate.name || "Unknown Candidate",
+                        phone: candidate.phone || "No phone",
+                        email: candidate.email || "No email",
+                        bio: candidate.bio || "",
+                        final_match_score: matchResult.finalScore,
+                        status: matchResult.status,
+                        breakdown: matchResult.breakdown
+                    });
+                }
+            } catch (aiError) {
+                logger.error(`AI logic error for candidate ${candidate.id}: ${aiError.message}`);
             }
-        });
+        }
 
         matchedCandidates.sort((a, b) => b.final_match_score - a.final_match_score);
 

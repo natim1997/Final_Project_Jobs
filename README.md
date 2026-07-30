@@ -25,22 +25,26 @@ It lives in its own repository, separate from the Android client, and runs as in
 
 The engine is split into two dedicated services to keep responsibilities clean and allow each side to scale independently:
 
-- **Node.js Backend (The Controller):** The bridge between Firestore and the AI. It listens for matching triggers from the app, fetches the relevant candidate and job data, and applies the initial hard-constraint filtering.
-- **Python AI Engine (The Brain):** A Flask service dedicated purely to machine learning and NLP. It receives the pre-filtered candidates, computes match scores, and returns the ranked results.
+- **Node.js Backend (The Controller):** The bridge between Firestore and the AI. It listens for matching triggers from the app, fetches the relevant candidate and job data, and applies the initial hard-constraint filtering (schedule, location, license).
+- **Python AI Engine (The Brain):** A Flask service dedicated to machine learning, NLP, and business-rule scoring. It runs its own gatekeeper checks, then scores and ranks the candidates who pass.
 
 ---
 
 ## The Matching Algorithm
 
-Matching runs in two distinct phases, designed for both accuracy and efficiency:
+Matching runs in three phases, designed for both accuracy and efficiency:
 
 ### 1. Hard Constraints Filtering (Node.js)
 
-Candidates who fail a non-negotiable requirement — such as schedule availability or a required license — are **filtered out immediately**, rather than simply receiving a lower cumulative score. This keeps clearly-impossible matches out of the pipeline early, saving compute power and keeping the candidate pool relevant before it ever reaches the AI stage.
+Candidates who fail a non-negotiable requirement — such as schedule availability or a required license — are **filtered out immediately**, rather than simply receiving a lower cumulative score. This keeps clearly-impossible matches out of the pipeline early, saving compute power before a request ever reaches the AI stage.
 
-### 2. AI Scoring & Ranking (Python)
+### 2. The Gatekeeper (Python)
 
-Candidates who pass the hard filters are sent to the AI Engine. It combines unstructured data (résumé text, job descriptions) with structured profile data, using machine learning models to produce a final compatibility score for each candidate.
+Before any scoring happens, the AI Engine runs its own hard checks on the pair: is the job within the candidate's search radius, does the candidate's profile actually read like a job seeker (not an employer), did they explicitly rule out this kind of work, and does the candidate show any sign of meeting a required credential (license/certification)? A failure at this stage returns a score of `0` immediately, with no further scoring.
+
+### 3. AI Scoring & Ranking (Python)
+
+Candidates who pass the gatekeeper are scored on two combined dimensions: a **Semantic & Experience Matcher** (60% weight — how relevant is this candidate's background to this specific job, via a fine-tuned RoBERTa model plus SVM/MLP classifiers) and a **Motivation & Soft-Skill Booster** (40% weight — transferable skills like responsibility and reliability, with an extra floor for casual/entry-level job categories so a lack of direct experience doesn't unfairly tank an otherwise promising candidate). The result is a single 0–100 score, mapped to a human-readable match tier.
 
 ---
 
@@ -50,8 +54,9 @@ To accurately score and rank candidates, the Python AI Engine executes a multi-s
 
 - **PDF Parsing & Data Extraction:** When a user uploads a résumé, the backend extracts the raw text from the PDF, pulling unstructured information that represents the user's background and experience.
 - **Semantic Matching (RoBERTa):** A fine-tuned RoBERTa model processes the text from both the job description and the candidate's parsed résumé. It generates contextual embeddings to calculate semantic similarity, understanding the *meaning* behind the text rather than just performing basic keyword matching.
-- **Feature Engineering:** The semantic similarity scores extracted from the NLP layer are combined with structured data (e.g., direct skill overlaps) into a comprehensive feature vector.
-- **Scoring Models (SVM & MLP):** The final feature vectors are fed into classification models to predict the match probability. The system uses both a Support Vector Machine (SVM) and a Multi-Layer Perceptron (MLP) neural network to weigh the extracted features and generate the definitive ranking score.
+- **Feature Engineering:** The semantic similarity score is combined with structured signals (SVM confidence, stated experience, transferable soft skills) into a feature set for the scoring models.
+- **Scoring Models (SVM & MLP):** An SVM produces a confidence signal and an MLP combines it with semantic similarity into a base relevance score — this is one half of the final score (the "Semantic & Experience" dimension).
+- **Business-Rule Layer (Gatekeeper & Motivation Booster):** On top of the ML models, an explicit rules layer disqualifies clear non-matches (wrong persona, explicit refusal, missing required credential) and boosts soft-skill/motivation signals for casual job categories, so a candidate isn't penalized purely for lacking direct industry experience in an entry-level role.
 
 ---
 
@@ -100,14 +105,23 @@ cd Node_Backend
 # Install packages
 npm install
 
-# Create a .env file with the port, the AI server URL, and Firebase credentials
-echo "PORT=8080" > .env
+# Create a .env file (see below for required keys)
+touch .env
 
 # Start the server
 npm start
 ```
 
-> ⚠️ &nbsp;`AI_SERVER_URL` must point to the Python engine **including its route path** (e.g. `http://127.0.0.1:5000/api/match` locally, or `https://<your-cloud-run-url>/api/match` in production) — the base URL alone will return a 404.
+Your `.env` needs:
+
+```env
+PORT=8080
+AI_SERVER_URL=http://127.0.0.1:5000
+```
+
+> ⚠️ &nbsp;`AI_SERVER_URL` is the Python engine's **base URL only** — no route path (e.g. `http://127.0.0.1:5000` locally, or your Cloud Run URL in production). The Node backend appends `/api/match` and `/api/generate-bio` itself; including the path here will produce a broken double-path URL.
+
+Firebase credentials come from a service account key file, not an env var: place `serviceAccountKey.json` in `Node_Backend/src/config/` for local development. In Cloud Run, this is skipped in favor of the service's default credentials automatically.
 
 ---
 
@@ -116,17 +130,18 @@ npm start
 A quick map of where the core logic lives:
 
 **Node.js Backend**
-- **`server.js`** — The controller's main entry point: route definitions, the Firebase connection, and outbound communication with the Python server.
+- **`server.js`** — The controller's main entry point: middleware, route registration, and the Firebase connection.
 - **`src/utils/scheduleMatcher.js`** — Implements the hard-constraint scheduling logic, used to immediately rule out candidates whose availability doesn't fit a job before they're sent to the AI for scoring.
-- **`src/controllers/matchController.js`** — Orchestrates the matching flow: fetches candidates and jobs, applies the hard-constraint filters, calls the AI Engine, and saves the ranked matches back to Firestore.
+- **`src/controllers/matchController.js`** — Orchestrates the matching flow for a candidate: fetches candidates and jobs, applies the hard-constraint filters, calls the AI Engine, and saves the ranked matches back to Firestore.
+- **`src/controllers/jobController.js`** — Employer-side job management (create/update/delete), and `getJobCandidates`, which runs the same AI-scoring flow in reverse to list matching candidates for a given job.
+- **`src/utils/matchCalculator.js`** — Shared city-based distance calculation (used by both controllers to build the AI payload) plus the final location gate and match status.
 - **`src/services/aiService.js`** — Handles the outbound request to the Python AI Engine and normalizes its response for the rest of the backend.
 - **`src/controllers/candidateController.js`** — Handles candidate profile creation/updates, including PDF résumé parsing (via `pdf-parse`) before the extracted text is sent onward for AI scoring. A dedicated `/api/extract-cv` route in `server.js` also exposes this extraction on its own.
 - **`package.json`** — Project configuration, dependencies, and the start script (`npm start`).
 
 **Python AI Engine**
-- **`app.py`** — The Flask server's entry point. Receives the filtered candidates, runs the scoring pipeline, and returns the results to Node.js.
-- **`final_pipeline.py`** — The core ML/NLP pipeline: loads the fine-tuned models (RoBERTa and MLP) and computes the semantic match between a résumé/profile and a job description.
-- **`svm_feature_extractor.py`** — Feature extraction and scoring logic for the SVM ranking model.
+- **`app.py`** — The Flask server's entry point. Composes candidate bios (`/api/generate-bio`) and runs the scoring pipeline (`/api/match`).
+- **`final_pipeline.py`** — The core pipeline: the Gatekeeper hard-check stage, RoBERTa semantic similarity, the SVM/MLP relevance models, and the soft-skill/motivation scoring that combines into the final 0–100 score.
 - **`saved_matching_model/`** — The fine-tuned RoBERTa model used for semantic matching.
 - **`saved_svm_model.pkl`** / **`saved_mlp_model.pkl`** — The trained SVM and MLP classifiers used for final match scoring.
 - **`requirements.txt`** — All Python packages required to run the ML engine.
@@ -141,4 +156,3 @@ A quick map of where the core logic lives:
 
 - Gal Deri
 - Netanel Michel
-

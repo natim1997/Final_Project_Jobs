@@ -160,4 +160,3 @@ The RoBERTa embedding model itself isn't stored in this repo - it's downloaded o
 
 - Gal Deri
 - Netanel Michel
-

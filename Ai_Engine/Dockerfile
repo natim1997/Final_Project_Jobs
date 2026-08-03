@@ -19,5 +19,15 @@ COPY . .
 # Set the port environment variable to 8080 (Cloud Run default)
 ENV PORT 8080
 
+# Cap CPU math-library thread pools (OpenMP/MKL/OpenBLAS) at 1.
+# Without this, torch/numpy size their internal thread pools off detected
+# CPU/memory and blow past the Cloud Run memory limit on every cold start
+# (measured: usage scales ~with the container's memory limit, not a fixed need).
+ENV OMP_NUM_THREADS=1
+ENV MKL_NUM_THREADS=1
+ENV OPENBLAS_NUM_THREADS=1
+ENV NUMEXPR_NUM_THREADS=1
+ENV TOKENIZERS_PARALLELISM=false
+
 # Run the web service on container startup using gunicorn
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app

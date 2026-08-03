@@ -31,11 +31,8 @@ def compose_candidate_bio(data):
     categories = ", ".join(data.get('jobCatagories', []))
     languages = ", ".join(data.get('languages', []))
     licenses = ", ".join(data.get('licenses', []))
-    # The real candidate form sends a single free-text "skills" string (e.g.
-    # "שירות לקוחות, סבלנות, עבודה עם קופה"), not a "softSkills" array - the
-    # array form is kept as a fallback in case some other client ever sends
-    # it that way. Without this, the entire skills field was silently
-    # dropped from the generated bio.
+    # skills comes as a free-text string from the real form, softSkills
+    # array is just a fallback in case some other client sends it that way
     raw_skills = data.get('skills', data.get('softSkills', ''))
     skills = ", ".join(raw_skills) if isinstance(raw_skills, list) else str(raw_skills or "")
     software = ", ".join(data.get('software', []))

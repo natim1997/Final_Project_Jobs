@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "body": {
+    "Breakdown": {
+      "Category_Bonus_Applied": false,
+      "Experience_Months": 36,
+      "Is_Simple_Job": true,
+      "Model2_Score": 61.6,
+      "Model3_Score": 66.0,
+      "SVM_Confidence": 0.837,
+      "Semantic_Similarity": 0.526
+    },
+    "Final_Score": 63,
+    "Reason": "התאמה חזקה - ציון גבוה גם בניסיון וגם בכישורים הרכים",
+    "Status": "STRONG MATCH",
+    "reason": "התאמה חזקה - ציון גבוה גם בניסיון וגם בכישורים הרכים",
+    "score": 63
+  }
+}

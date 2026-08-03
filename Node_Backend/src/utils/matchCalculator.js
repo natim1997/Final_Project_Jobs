@@ -126,8 +126,13 @@ const calculateFinalMatchScore = (job, candidate, rawAiScore) => {
     // FINAL SCORING
     // ==========================================
 
-    // Thresholds aligned with the AI engine's score ranges (final_pipeline.py):
-    // 0 = disqualified, 1-59 = poor match, 60+ = good potential and above.
+    // Thresholds aligned with the AI engine's rescaled display score
+    // (final_pipeline.py, _rescale_display_score): 0 = disqualified,
+    // 1-59 = poor match, 60+ = good potential and above. The AI engine's
+    // internal raw score is stretched onto the full 0-100 range before it
+    // reaches this function, calibrated so the median real relevant match
+    // lands right around 60 - keep this threshold in sync with
+    // _RESCALE_ANCHORS in final_pipeline.py if that calibration changes.
     if (finalScore >= 60) {
         status = "MATCH";
     } else if (finalScore >= 1) {

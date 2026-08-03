@@ -12,7 +12,7 @@ from geopy.exc import GeocoderTimedOut
 # ==========================================
 # 1. Initialize Firebase & Geocoder
 # ==========================================
-# Make sure your serviceAccountKey.json is in the same folder!
+
 try:
     cred = credentials.Certificate(r"C:\Users\netan\JobMatcher_Project\Node_Backend\src\config\serviceAccountKey.json")
     firebase_admin.initialize_app(cred, {

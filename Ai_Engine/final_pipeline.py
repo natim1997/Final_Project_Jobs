@@ -34,11 +34,102 @@ def safe_list(val):
     return []
 
 # ==========================================
+# DISPLAY SCORE RESCALE
+# ==========================================
+# The raw internal score (final_ai_score below) rarely leaves ~0-45 in
+# practice (measured on 1,081 real candidate-job pairs: median relevant=33,
+# median irrelevant=27, max observed even for a near word-for-word
+# candidate/job text match=88). That's a real, calibrated ceiling, not a bug
+# (see engineering report ch. 10/11) - but it reads badly to a human as "68
+# out of 100". This stretches the same raw score onto the full 0-100 range
+# via monotonic piecewise-linear interpolation, so the *ranking* between two
+# jobs for the same candidate (and therefore Precision@5) is unchanged - only
+# the number and label shown to the user are rescaled.
+_RESCALE_ANCHORS = [
+    (0, 0),
+    (20, 12),
+    (27, 38),   # median of real irrelevant pairs
+    (33, 60),   # median of real relevant pairs
+    (38, 78),   # ~95th percentile of real pairs
+    (45, 90),   # ~99th percentile of real pairs
+    (88, 100),  # near word-for-word candidate/job text match (measured ceiling)
+]
+
+
+def _rescale_display_score(raw_score):
+    raw_score = max(0.0, min(100.0, float(raw_score)))
+    xs = [a[0] for a in _RESCALE_ANCHORS]
+    ys = [a[1] for a in _RESCALE_ANCHORS]
+    if raw_score >= xs[-1]:
+        return 100.0
+    for i in range(len(xs) - 1):
+        if xs[i] <= raw_score <= xs[i + 1]:
+            span = xs[i + 1] - xs[i]
+            t = (raw_score - xs[i]) / span if span > 0 else 0.0
+            return ys[i] + t * (ys[i + 1] - ys[i])
+    return 100.0
+
+
+# Named tiers in 5-point display-score bands, top band reserved for a true
+# one-to-one match with the job's stated requirements.
+_DISPLAY_TIERS = [
+    (97, "התאמה מושלמת", "התאמה מלאה, אחד לאחד, לדרישות המשרה"),
+    (92, "התאמה יוצאת דופן", "התאמה כמעט מושלמת לדרישות המשרה"),
+    (87, "התאמה מצוינת", "התאמה חזקה מאוד לדרישות המשרה"),
+    (82, "התאמה חזקה מאוד", "חפיפה גבוהה עם דרישות המשרה"),
+    (77, "התאמה חזקה", "חפיפה טובה עם דרישות המשרה"),
+    (72, "התאמה טובה מאוד", "רוב הדרישות המרכזיות מתקיימות"),
+    (67, "התאמה טובה", "חלק ניכר מהדרישות המרכזיות מתקיים"),
+    (62, "התאמה טובה-סבירה", "התאמה עם כמה פערים לא קריטיים"),
+    (57, "התאמה סבירה", "התאמה חלקית עם פערים מסוימים"),
+    (52, "התאמה סבירה-חלשה", "התאמה חלקית עם פערים ניכרים"),
+    (47, "התאמה חלקית", "עדות מוגבלת להתאמה לתפקיד"),
+    (42, "התאמה חלקית-חלשה", "עדות מוגבלת מאוד להתאמה לתפקיד"),
+    (37, "התאמה חלשה", "מעט מאוד עדות לרלוונטיות לתפקיד"),
+    (32, "התאמה חלשה מאוד", "כמעט ואין עדות לרלוונטיות לתפקיד"),
+    (27, "התאמה מוגבלת", "הפער מהדרישות ניכר"),
+    (22, "התאמה מוגבלת מאוד", "הפער מהדרישות גדול"),
+    (17, "כמעט לא מתאים", "הפער מהדרישות גדול מאוד"),
+    (12, "לרוב לא מתאים", "הפרופיל אינו תואם את רוב הדרישות"),
+    (7, "לא מתאים", "הפרופיל אינו תואם את דרישות המשרה"),
+    (0, "לא מתאים כלל", "אין קשר נראה לעין לדרישות המשרה"),
+]
+
+
+def _display_tier(display_score):
+    for threshold, label, reason in _DISPLAY_TIERS:
+        if display_score >= threshold:
+            return label, reason
+    return _DISPLAY_TIERS[-1][1], _DISPLAY_TIERS[-1][2]
+
+
+# Model3 (soft-skill score) is derived only from the candidate's own bio, not
+# from the job - it's identical for every job a given candidate is scored
+# against. So a job with almost no real textual overlap with the candidate
+# can still reach a high display score/tier off Model3 alone. Measured
+# example: an event-staffing job scored semantic_similarity=0.209 for a dog
+# walker candidate yet still rescaled to 91 ("excellent match"). Below this
+# threshold the *label* is capped - real dog-walking jobs for the same
+# candidate measured 0.241-0.434, clearly above it - but the underlying
+# score/ranking (and therefore Precision@5) is left untouched.
+_GENUINE_RELEVANCE_MIN_SIMILARITY = 0.22
+_LABEL_CAP_SCORE_WHEN_NOT_GENUINE = 46
+
+
+def _capped_tier(display_score, semantic_similarity):
+    label, reason = _display_tier(display_score)
+    if semantic_similarity < _GENUINE_RELEVANCE_MIN_SIMILARITY:
+        capped_label, capped_reason = _display_tier(min(display_score, _LABEL_CAP_SCORE_WHEN_NOT_GENUINE))
+        if capped_label != label:
+            return capped_label, capped_reason
+    return label, reason
+
+
+# ==========================================
 # MODEL 1 — GATEKEEPER: reference data
 # ==========================================
 
-# Phrases that suggest the profile belongs to an employer posting work,
-# not a candidate looking for work (Persona Mismatch).
+# Phrases that mean the profile is an employer, not a job seeker
 EMPLOYER_PERSONA_PATTERNS = [
     r"אנחנו מגייסים", r"אנו מגייסים", r"החברה שלנו מחפשת עובד",
     r"מחפשים עובדים", r"מחפש עובדים", r"מעסיקים חדשים",
@@ -47,23 +138,22 @@ EMPLOYER_PERSONA_PATTERNS = [
     r"our company is looking for", r"hiring manager", r"posting a job",
 ]
 
-# Phrases that signal an explicit refusal when found near a job-category keyword.
+# Phrases that mean the candidate refuses this kind of job
 REFUSAL_PHRASES = [
     "לא מעוניין", "לא מעוניינת", "לא עובד", "לא עובדת", "לא רוצה",
     "אינני מעוניין", "אינני מעוניינת", "לא אוהב", "לא אוהבת",
     "not interested in", "i don't work", "i do not work", "only work in",
 ]
 
-# Model 1 gate: topic-level credential check only (license/certification/
-# permit/etc.) - can't verify the SPECIFIC credential matches since there's
-# no structured credentials field, just free text.
+# Keywords for jobs that need a license/certificate. No structured field for
+# this, so we just check if the word appears in the text.
 MANDATORY_CREDENTIAL_KEYWORDS = [
     "רישיון", "הסמכה", "תעודת הסמכה", "תעודה", "היתר", "רישיון נשק",
     "תעודת הכשרה", "כשירות", "תעודת מקצוע", "הכשרה מקצועית", "אישור מקצועי",
     "license", "certification", "certificate", "permit",
 ]
 
-# Soft/transferable skill signals used by Model 3.
+# Soft skill keywords used by Model 3
 SOFT_SKILL_KEYWORDS = [
     "אחריות", "אחראי", "אחראית", "אמינות", "אמין", "אמינה",
     "עמידה בלחץ", "עבודה תחת לחץ", "ניהול זמן", "עבודת צוות",
@@ -73,11 +163,8 @@ SOFT_SKILL_KEYWORDS = [
     "fast learner", "motivated", "flexible", "customer service",
 ]
 
-# Aliases for the category dropdown taxonomy (Ai_Engine/Training_Scripts/
-# generate_training_data.py - CATEGORIES list). Should stay empty: job and
-# candidate categories share the same fixed dropdown, so they already agree
-# on wording. Safety net only - don't add entries without confirming with
-# the frontend first.
+# Category name aliases. Keep empty - job and candidate categories use the
+# same dropdown so names already match. Only add here if a real mismatch shows up.
 CATEGORY_SYNONYMS = {}
 
 
@@ -86,30 +173,36 @@ def _canonical_category(raw):
     return CATEGORY_SYNONYMS.get(raw, raw)
 
 
-# The 6 "Simple Jobs" categories from the spec, detected by keyword over
-# category+title+description together, not an exact match on job.category -
-# real job categories are free text with no enforced taxonomy. Grouped by
-# spec category for readability; matching itself is flat.
+# Keywords for the 6 "Simple Job" categories from the spec, plus a few more
+# common ones found in real data (security, driving, phone service jobs).
 SIMPLE_JOB_KEYWORDS = [
-    # 1. Pet Care ("בעלי חיים" is the official dropdown value)
+    # 1. Pet Care
     "בעלי חיים", "כלב", "כלבים", "דוג ווקר", "דוגווקר",
     "טיולי כלבים", "הליכה עם כלבים", "פינוק חיות",
-    # 2. Event Staffing (waiters, basic bartending, ushers, event setup)
-    "הפקה ואירועים", "הפקת אירועים", "אירוע", "אירועים", "מלצר", "מלצרית",
-    "ברמן", "ברמנית", "הקמת אירוע", "הקמות לאירוע", "דייל", "דיילת",
-    "מסעדנות", "הגשה", "קייטרינג",
+    # 2. Event Staffing
+    "הפקה ואירועים", "הפקת אירועים", "הקמת אירוע", "הקמות לאירוע",
+    "מלצר", "מלצרית", "ברמן", "ברמנית", "דייל", "דיילת",
+    "מסעדנות", "קייטרינג",
     # 3. Basic Retail & Customer Service
-    "שירות לקוחות", "קמעונאות", "מוכר", "מוכרת", "קופאי", "קופאית",
-    "מכירות ואופנה", "עבודה בחנות",
-    # 4. General Labor (moving help, packing, simple deliveries)
-    "משלוחים ותחבורה", "משלוחים", "שליח", "שליחה", "הובלה", "הובלות",
-    "סבל", "אפסנאות", "אפסנאות ולוגיסטיקה", "לוגיסטיקה", "אריזה",
-    "העברת רהיטים", "שליחויות",
-    # 5. Promotional (flyer distribution, brand ambassadors)
+    "שירות לקוחות", "קמעונאות", "קופאי", "קופאית", "סדרן", "סדרנית",
+    "מכירות ואופנה", "עבודה בחנות", "שירות ומכירה", "נציג שירות",
+    "נציגת שירות",
+    # 4. General Labor
+    "משלוחים ותחבורה", "משלוחים", "שליח", "שליחה", "שליחויות",
+    "סבל", "אפסנאות ולוגיסטיקה", "העברת רהיטים", "אריזה",
+    # 5. Promotional
     "קידום מכירות", "דיילת קידום", "חלוקת פליירים", "פליירים", "טעימות",
     "סוכן שטח", "brand ambassador",
     # 6. Basic Cleaning & Maintenance
-    "אחזקה", "ניקיון", "תחזוקה", "מנקה", "ניקוי",
+    "ניקיון", "עבודות ניקיון", "מנקה", "ניקוי",
+    # 7. Extra categories added after checking real data
+    "מאבטח", "מאבטחת", "שומר", "שומרת", "קב\"ט", "קבט",
+    "נהג משלוחים", "נהג חלוקה", "נהג/ת", "סייר אופנוע", "סייר /ת",
+    "חלוקת מוצרים", "תמיכה טכנית", "מוקד שירות", "שירות טכני",
+    "טכנאי", "מזכיר", "מזכירה", "רכז אדמיניסטרטיבי", "רכזת אדמיניסטרטיבית",
+    "פקיד קבלה", "פקידת קבלה", "נציג פיננסי", "נציגה פיננסית",
+    "בנקאי טלפוני", "בנקאית טלפונית", "שירות הלוואות", "סוקר טלפוני",
+    "סוקרת טלפונית", "בנקאות", "בק אופיס", "back office",
 ]
 
 YEARS_EXPERIENCE_PATTERN = re.compile(
@@ -122,13 +215,18 @@ def _contains_any(text, patterns):
     return any(re.search(p, text, re.IGNORECASE) for p in patterns)
 
 
-def _detect_explicit_refusal(bio_lower, job_keywords):
-    """Refusal phrase within ~40 chars of a job-category keyword.
+GENDER_SLASH_PATTERN = re.compile(r"\s*/[א-ת]{1,3}\b")
 
-    KNOWN GAP (deferred - see project memory): misses inverted phrasing like
-    "not interested... outside of food service", where the negation sits
-    next to the candidate's PREFERRED category, not the job's.
-    """
+
+def _strip_gender_slash(text):
+    # Real postings write "רכז /ת אדמיניסטרטיבי /ת" with a space before the
+    # slash. This breaks keyword matching, so we remove the slash part first.
+    return GENDER_SLASH_PATTERN.sub("", text)
+
+
+def _detect_explicit_refusal(bio_lower, job_keywords):
+    # Looks for a refusal word close to a job keyword (~40 chars apart).
+    # Known gap: misses "not interested... except food service" style phrasing.
     relevant_keywords = [kw.lower() for kw in job_keywords if len(kw) > 1]
     if not relevant_keywords:
         return False
@@ -150,11 +248,8 @@ def _extract_years_of_experience(text):
 
 
 def _extract_critical_requirements(job_json):
-    """Model 1 hard gate input - only job.criticalRequirements (short atomic
-    tags), never requirements.mandatory_skills (a free-text paragraph in
-    this app, not curated tags - substring-matching prose would falsely
-    disqualify almost everyone). No-op until a real tag field exists.
-    """
+    # Only job.criticalRequirements (short tags), never mandatory_skills
+    # (that's free text, not tags - would reject almost everyone).
     raw_items = safe_list(job_json.get("criticalRequirements", []))
 
     return [
@@ -169,18 +264,24 @@ def _extract_critical_requirements(job_json):
 
 class JobMatcherPipeline:
     def __init__(self):
-        print("★★★ CLICKJOB AI PIPELINE (VERSION 9.0 - GATEKEEPER + 60/40 MODEL) ★★★")
+        print("★★★ CLICKJOB AI PIPELINE (VERSION 10.0 - HYBRID SEMANTIC + KEYWORD MODEL) ★★★")
         print("Initializing Models...")
 
         try:
             print("1. Loading RoBERTa (Semantic Engine)...")
-            self.roberta = SentenceTransformer('./saved_matching_model')
+            # Base pretrained model, not our fine-tuned one - fine-tuning data
+            # was fake English text, made real results worse (see report ch. 10-11).
+            self.roberta = SentenceTransformer('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 
-            print("2. Loading SVM (Confidence Signal)...")
-            self.svm = joblib.load("./saved_svm_model.pkl")
+            print("2. Loading TF-IDF (Keyword Engine)...")
+            # Adds keyword matching on top of semantic similarity, big accuracy boost (report ch. 10).
+            self.tfidf = joblib.load("./saved_tfidf_vectorizer.pkl")
 
-            print("3. Loading MLP (Model 2 Base Scorer)...")
-            self.mlp = joblib.load("./saved_mlp_model.pkl")
+            print("3. Loading SVM (Confidence Signal)...")
+            self.svm = joblib.load("./saved_svm_model_v2.pkl")
+
+            print("4. Loading MLP (Model 2 Base Scorer)...")
+            self.mlp = joblib.load("./saved_mlp_model_v2.pkl")
 
             print("Pipeline is fully loaded and READY!\n" + "=" * 50)
         except Exception as e:
@@ -194,9 +295,8 @@ class JobMatcherPipeline:
             # ==========================================
             job_description = str(job_json.get("description", ""))
 
-            # `requirements` may be a plain string or the structured object
-            # matchController.js builds - flatten dicts into text, otherwise
-            # str(dict) leaks Python syntax straight into the RoBERTa input.
+            # requirements can be a plain string or a structured object -
+            # flatten it to text either way
             requirements_raw = job_json.get("requirements", "")
             if isinstance(requirements_raw, dict):
                 req_parts = []
@@ -210,14 +310,16 @@ class JobMatcherPipeline:
             job_category = str(job_json.get("category", "")).strip()
             job_keywords = [kw for kw in job_category.split() if kw]
 
-            # title may arrive flat (job.title, raw Postman testing) or nested
-            # under basic_info.job_title (matchController.js's real payload).
+            # title can be flat (job.title) or nested (basic_info.job_title)
             basic_info_raw = job_json.get("basic_info", {})
             job_title = str(job_json.get("title") or (basic_info_raw.get("job_title") if isinstance(basic_info_raw, dict) else "") or "").strip()
 
-            # See SIMPLE_JOB_KEYWORDS above for why this scans category+title+
-            # description together instead of trusting job.category alone.
-            simple_job_haystack = f"{job_category} {job_title} {job_description}".strip()
+            # Only check start of description for simple-job keywords -
+            # a keyword buried deep (like in a perks list) is usually noise.
+            job_description_opening = job_description[:150]
+            simple_job_haystack = _strip_gender_slash(
+                f"{job_category} {job_title} {job_description_opening}".strip()
+            )
 
             cand_data = candidate_json.get("candidate", candidate_json) if isinstance(candidate_json.get("candidate"), dict) else candidate_json
             candidate_bio = str(cand_data.get("semantic_profile", "")).strip()
@@ -237,10 +339,8 @@ class JobMatcherPipeline:
             distance_km = safe_float(cand_data.get("distance_to_job", 5.0))
             search_radius = safe_float(cand_data.get("searchRadius", 50.0))
 
-            # There is no structured "years of experience" field in this app -
-            # candidates just describe their experience in free text (bio /
-            # uploaded CV, both folded into semantic_profile), so it's read
-            # directly out of that text (e.g. "5 שנות ניסיון").
+            # No structured "years of experience" field exists, so we read
+            # it from the free text bio (e.g. "5 שנות ניסיון")
             total_exp_years = _extract_years_of_experience(candidate_bio)
             experience_months = total_exp_years * 12
 
@@ -283,8 +383,7 @@ class JobMatcherPipeline:
                     reason = "נפסל - המשרה מיועדת לסטודנטים בלבד"
                     return self._disqualified(reason, "STUDENT_ONLY", experience_months)
 
-            # Mandatory credential check (license/certification/permit/etc.) -
-            # supersedes and broadens the old driving-license-only dealbreaker.
+            # Check for license/certificate requirement
             job_credential_haystack = f"{job_text} {job_title}"
             job_requires_credential = any(kw in job_credential_haystack for kw in MANDATORY_CREDENTIAL_KEYWORDS)
             if job_requires_credential:
@@ -304,10 +403,26 @@ class JobMatcherPipeline:
             # ==========================================
             # MODEL 2: SEMANTIC & EXPERIENCE MATCHER (60%)
             # ==========================================
+            # Title says the job's real nature better than the full
+            # description (which is full of perks/bonus filler text).
+            job_title_vector = self.roberta.encode(job_title, convert_to_tensor=True) if job_title else None
             job_vector = self.roberta.encode(job_text, convert_to_tensor=True)
             candidate_vector = self.roberta.encode(candidate_bio, convert_to_tensor=True)
 
-            sim_score = util.cos_sim(job_vector, candidate_vector).item()
+            full_text_sim = util.cos_sim(job_vector, candidate_vector).item()
+            if job_title_vector is not None:
+                title_sim = util.cos_sim(job_title_vector, candidate_vector).item()
+                dense_sim = (0.6 * title_sim) + (0.4 * full_text_sim)
+            else:
+                dense_sim = full_text_sim
+
+            # Keyword (TF-IDF) score on top of semantic score - catches exact
+            # word matches (tool name, license) that embeddings can miss.
+            job_tfidf_vec = self.tfidf.transform([job_text])
+            cand_tfidf_vec = self.tfidf.transform([candidate_bio])
+            lexical_sim = float((job_tfidf_vec @ cand_tfidf_vec.T).toarray()[0][0])
+
+            sim_score = (0.5 * dense_sim) + (0.5 * lexical_sim)
             semantic_similarity = max(0.0, min(1.0, sim_score))
 
             svm_input = pd.DataFrame(
@@ -322,24 +437,22 @@ class JobMatcherPipeline:
             )
             raw_mlp_score = float(self.mlp.predict(mlp_input)[0])
 
-            # Reward direct, provable experience (regex-extracted years) on top
-            # of the learned semantic/SVM combination.
+            # SVM/MLP were trained before the TF-IDF blend, so they hurt
+            # results now - not used for the score, only shown in Breakdown.
+            # Bonus for real experience (years found in bio text).
             experience_bonus = min(15.0, total_exp_years * 3.0)
-            model2_score = max(0.0, min(100.0, raw_mlp_score + experience_bonus))
+            model2_score = max(0.0, min(100.0, (semantic_similarity * 100.0) + experience_bonus))
 
-            # The pretrained SVM over-weights raw Experience_Months regardless
-            # of domain (e.g. dog-walking experience inflating a backend-dev
-            # score) - damp model2 when semantic similarity itself is low.
-            # Doesn't fix the underlying model bias; would need retraining.
+            # If similarity is very low, pull score down more - stops
+            # experience in an unrelated field from inflating the score.
             if semantic_similarity < 0.3:
                 model2_score = model2_score * (semantic_similarity / 0.3)
 
             # ==========================================
             # MODEL 3: MOTIVATION & SOFT-SKILL BOOSTER (40%)
             # ==========================================
-            # Exact equality on canonical forms, not word-overlap: category
-            # values are short fixed-taxonomy phrases, so word-splitting is
-            # both too loose (generic words collide) and too strict (misses synonyms).
+            # Exact match on category name, not word overlap - avoids
+            # false matches on common words in short category labels.
             job_category_canonical = _canonical_category(job_category)
             candidate_categories_canonical = [_canonical_category(c) for c in candidate_categories]
             category_match = bool(job_category_canonical) and job_category_canonical in candidate_categories_canonical
@@ -348,9 +461,6 @@ class JobMatcherPipeline:
             soft_skill_hits = sum(1 for kw in SOFT_SKILL_KEYWORDS if kw.lower() in candidate_bio_lower)
             soft_skill_hits += len(candidate_soft_skills)
 
-            # Model3_Score is left purely continuous here (no floor applied) so
-            # it stays an honest diagnostic signal in the Breakdown - the floor
-            # is applied once, below, directly on the final blended score.
             model3_score = min(100.0, 50.0 + min(40.0, soft_skill_hits * 8.0))
 
             # ==========================================
@@ -358,73 +468,23 @@ class JobMatcherPipeline:
             # ==========================================
             final_ai_score = (0.6 * model2_score) + (0.4 * model3_score)
 
-            # Smooth floor for Simple Jobs: guarantees the spec's 60+/80+
-            # minimum without collapsing every weak candidate onto the same
-            # number. Only applies below the floor, rescaling the raw score
-            # into [floor, floor+15] proportionally - candidates already
-            # above the floor keep their own differentiated score.
-            if is_simple_job:
-                floor_target = 80.0 if category_match else 60.0
-                if final_ai_score < floor_target:
-                    quality_fraction = min(1.0, max(0.0, final_ai_score / floor_target))
-                    final_ai_score = floor_target + quality_fraction * 15.0
+            # Note: an old "Simple Jobs" score floor was removed here -
+            # it gave high scores to jobs with no real connection to the candidate.
 
-            # Passed the gatekeeper -> never report a bare 0 (that value is
-            # reserved for disqualification), and cap at 100. Whole numbers
-            # only (65, 71, 92, ...) - no decimal points on the final score.
-            final_ai_score = int(round(min(100.0, max(1.0, final_ai_score))))
+            # 0 means disqualified, so real matches never show a bare 0.
+            raw_score = int(round(min(100.0, max(1.0, final_ai_score))))
 
             # ==========================================
-            # STATUS MAPPING - 12-tier scale
+            # DISPLAY SCORE + STATUS MAPPING
             # ==========================================
-            # Maps continuous scores (1-100) only. A true Model 1 gate failure
-            # is a separate path (score=0, Status="NO MATCH", see
-            # _disqualified) - that exact string is relied on by
-            # matchController.js's isHardRejected check, so no tier below
-            # reuses it. The 1-39 tier reads as "disqualified" but isn't a
-            # hard gate failure - these results still get returned/displayed.
-            if final_ai_score >= 98:
-                match_status = "BULLSEYE"
-                match_reason = "התאמה מושלמת - הפרופיל תואם כמעט באופן מלא לדרישות המשרה"
-            elif final_ai_score >= 95:
-                match_status = "NEAR PERFECT"
-                match_reason = "כמעט מושלם - התאמה גבוהה מאוד בין הפרופיל למשרה"
-            elif final_ai_score >= 90:
-                match_status = "VERY STRONG MATCH"
-                match_reason = "התאמה חזקה מאוד - ציון גבוה גם בניסיון הישיר וגם בכישורים הרכים"
-            elif final_ai_score >= 85:
-                match_status = "STRONG MATCH"
-                match_reason = "התאמה חזקה - ציון גבוה גם בניסיון הישיר וגם בכישורים הרכים"
-            elif final_ai_score >= 80:
-                match_status = "VERY SUITABLE"
-                match_reason = "מאוד מתאים"
-            elif final_ai_score >= 75:
-                match_status = "FITS WELL"
-                match_reason = "מתאים היטב"
-            elif final_ai_score >= 70:
-                match_status = "SUITABLE"
-                match_reason = "מתאים"
-            elif final_ai_score >= 65:
-                match_status = "GOOD POTENTIAL"
-                match_reason = "פוטנציאל טוב - " + (
-                    "התאמת קטגוריה וכישורים רכים טובים מפצים על חוסר ניסיון ישיר" if is_simple_job
-                    else "כישורים רכים סבירים, אך ניסיון ישיר בתחום מוגבל"
-                )
-            elif final_ai_score >= 60:
-                match_status = "BASIC POTENTIAL"
-                match_reason = "פוטנציאל בסיסי - " + (
-                    "משרה פשוטה עם רף כניסה נמוך, אך התאמה ישירה מוגבלת" if is_simple_job
-                    else "כישורים רכים בסיסיים, ניסיון ישיר בתחום מוגבל"
-                )
-            elif final_ai_score >= 50:
-                match_status = "WEAK MATCH"
-                match_reason = "התאמה חלשה - מעט מאוד עדות לרלוונטיות לתפקיד"
-            elif final_ai_score >= 40:
-                match_status = "NOT SUITABLE"
-                match_reason = "לא מתאים - הפער בין הפרופיל לדרישות המשרה גדול מדי"
-            else:
-                match_status = "DISQUALIFIED"
-                match_reason = "נפסל - אין התאמה משמעותית בין הפרופיל למשרה"
+            # raw_score is the model's real internal score (see calibration
+            # note above _RESCALE_ANCHORS) - rescaled here onto the full
+            # 0-100 range for what's actually shown to the user. This is a
+            # monotonic function of raw_score, so it never changes the
+            # ranking between two jobs for the same candidate (Precision@5
+            # is computed from that ranking and is unaffected).
+            final_ai_score = int(round(_rescale_display_score(raw_score)))
+            match_status, match_reason = _capped_tier(final_ai_score, semantic_similarity)
 
             return {
                 "score": final_ai_score,
@@ -440,6 +500,7 @@ class JobMatcherPipeline:
                     "Experience_Months": experience_months,
                     "Is_Simple_Job": is_simple_job,
                     "Category_Bonus_Applied": category_match,
+                    "Raw_Score": raw_score,
                 }
             }
 

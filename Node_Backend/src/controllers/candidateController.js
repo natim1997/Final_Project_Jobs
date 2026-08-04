@@ -6,21 +6,14 @@ const { triggerSingleCandidateMatch } = require('../services/backgroundMatcher')
 
 const createCandidate = async (req, res) => {
     try {
-        // 1. Parse incoming data first to extract the frontend ID
         let data = req.body.candidateData ? JSON.parse(req.body.candidateData) : req.body;
-
-        // 2. Use the ID from the frontend, or auth, or generate a new one
         const userId = data.id || (req.user ? req.user.uid : db.collection('candidates').doc().id);
-
-        // 3. Point to the exact document ID in Firestore
         const candidateRef = db.collection('candidates').doc(userId);
 
-        // 4. Fetch existing data first (read-before-write) so we never wipe fields
-        //    that aren't part of this specific request.
+        // Read-before-write so we never wipe fields that aren't part of this request
         const existingDoc = await candidateRef.get();
         const existingData = existingDoc.exists ? existingDoc.data() : {};
 
-        // 5. Extract Text from CV if provided
         let cvText = "";
         if (req.file) {
             try {
@@ -32,7 +25,6 @@ const createCandidate = async (req, res) => {
             }
         }
 
-        // 6. Request AI Bio Generation from Python
         let semanticProfile = existingData.semantic_profile || "";
         try {
             const aiServerBase = process.env.AI_SERVER_URL || "http://127.0.0.1:5000";
@@ -49,7 +41,6 @@ const createCandidate = async (req, res) => {
             semanticProfile = `${data.bio || existingData.bio || ""} ${data.other || existingData.other || ""}`.trim();
         }
 
-        // 7. Build the merged object.
         const updatedData = {
             ...existingData,
             ...data,
@@ -68,10 +59,10 @@ const createCandidate = async (req, res) => {
             updatedAt: Date.now()
         };
 
-        // 8. Save back to Firestore
         await candidateRef.set(updatedData);
 
-        // 9. Run the match engine and WAIT for it to finish before responding.
+        // Awaited (not fire-and-forget) so the match run finishes before the response
+        // is sent - see backgroundMatcher.js for why Cloud Run makes that necessary.
         if (typeof triggerSingleCandidateMatch === 'function') {
             try {
                 await triggerSingleCandidateMatch(userId);

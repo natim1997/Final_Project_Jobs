@@ -8,10 +8,10 @@ const getAiSemanticScore = async (job, candidate) => {
         const aiServerBase = process.env.AI_SERVER_URL || "http://127.0.0.1:5000";
         const pythonServerUrl = `${aiServerBase}/api/match`;
 
-        // simple english comment: Extract the bio text safely no matter how it is named in Firebase
+        // Candidate profile field is named inconsistently across callers (bio vs description)
         const candidateText = candidate.bio || candidate.description || "";
 
-        // simple english comment: Construct the payload and force both naming conventions for safety
+        // Send both field names so the AI engine finds the text regardless of which it reads
         const payload = {
             job: job,
             candidate: {
@@ -23,19 +23,17 @@ const getAiSemanticScore = async (job, candidate) => {
 
         const response = await axios.post(pythonServerUrl, payload);
 
-        // simple english comment: Safely extract names for the log
         const jobTitle = job.basic_info?.job_title || "Unknown Position";
         const candId = candidate.candidateId || "Unknown Candidate";
 
-        // simple english comment: CRITICAL: Using backticks (`) for string interpolation, NOT quotes (")
         console.log(`\n---- PYTHON AI SCORE FOR: ${jobTitle} | CANDIDATE: ${candId} ----`);
         console.log(response.data);
         console.log("--------------------------------------------------------------\n");
 
-        // simple english comment: Handle Python's Capitalized Keys safely
+        // Python's response uses Capitalized keys; check lowercase too in case that changes
         let score = response.data.Final_Score ?? response.data.final_score ?? response.data.score ?? 0;
 
-        // simple english comment: Scale Fix: Convert decimal to percentage
+        // Older AI responses returned a 0-1 decimal instead of a 0-100 score
         if (score > 0 && score <= 1) {
             score = score * 100;
         }
@@ -43,7 +41,7 @@ const getAiSemanticScore = async (job, candidate) => {
         const reason = response.data.Reason || response.data.reason || response.data.explanation || "Match based on your overall profile and skills.";
         const status = response.data.Status || response.data.status || "NO MATCH";
 
-        // simple english comment: Return both naming formats to ensure matchController.js catches it
+        // Both naming conventions returned since matchController.js reads Final_Score/score interchangeably
         return {
             score: score,
             reason: reason,

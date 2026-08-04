@@ -43,9 +43,8 @@ def compose_candidate_bio(data):
 
     # Building the semantic string in Hebrew
     bio_text = f"פרופיל מקצועי של {name}. "
-    
-    # CRITICAL FIX - Inject the user's free text bio here!
-    if original_bio: 
+
+    if original_bio:
         bio_text += f"תיאור אישי: {original_bio}. "
         
     if categories: bio_text += f"מעוניין לעבוד בתחומים: {categories}. "
